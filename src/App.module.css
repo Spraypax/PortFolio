@@ -29,11 +29,7 @@
 
 @media (max-width: 1439px) {
   .contentGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-  }
-  .projects {
-    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 2.2fr) minmax(232px, 1fr) minmax(245px, 1fr);
   }
   .bottomGrid {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr) minmax(0, 1fr);
@@ -41,6 +37,13 @@
 }
 
 @media (max-width: 1023px) {
+  .contentGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .projects {
+    grid-column: 1 / -1;
+  }
   .bottomGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

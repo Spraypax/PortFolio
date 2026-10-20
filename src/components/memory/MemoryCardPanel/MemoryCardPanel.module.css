@@ -63,20 +63,11 @@
   white-space: nowrap;
 }
 
-.status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  color: var(--color-text-muted);
-  font: 0.6rem var(--font-display);
-}
-
-.status span {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #8dbaff;
+@container (max-width: 240px) {
+  .content {
+    grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+    gap: 4px;
+  }
 }
 
 @container (min-width: 380px) {

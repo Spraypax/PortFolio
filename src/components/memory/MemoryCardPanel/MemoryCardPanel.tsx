@@ -44,9 +44,6 @@ export function MemoryCardPanel({ className = '' }: { className?: string }) {
           </ul>
         </div>
       </div>
-      <p className={styles.status}>
-        <span aria-hidden="true" /> Sample save · All ideas welcome
-      </p>
     </Panel>
   )
 }

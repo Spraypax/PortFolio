@@ -56,6 +56,13 @@
   background: linear-gradient(90deg, var(--bar-start), var(--bar-end));
 }
 
+@container (max-width: 240px) {
+  .row {
+    grid-template-columns: 18px minmax(78px, 1fr) minmax(28px, 1fr) 28px;
+    gap: 7px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bar::-webkit-progress-value {
     transform: none;

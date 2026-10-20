@@ -32,7 +32,7 @@
   --font-body: 'Inter Variable', sans-serif;
   --font-display: 'Oxanium', sans-serif;
   --page-gutter: clamp(1rem, 2.2vw, 2.75rem);
-  --header-height: 82px;
+  --header-height: 64px;
   --z-background: -1;
   --z-content: 0;
   --z-panel: 1;

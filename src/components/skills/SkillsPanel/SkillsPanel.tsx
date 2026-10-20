@@ -13,7 +13,6 @@ export function SkillsPanel({ className }: { className?: string }) {
           <SkillBar key={skill.name} skill={skill} revealed={inView} />
         ))}
       </ul>
-      <p className={styles.note}>Always learning. Always leveling up.</p>
     </Panel>
   )
 }

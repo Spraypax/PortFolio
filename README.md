@@ -106,8 +106,8 @@ Les PNG originaux représentent environ 5,3 Mo. Ils sont conservés intacts ; de
 Les principaux seuils sont identiques dans les composants :
 
 - **1440 px et plus** : composition desktop, trois panneaux dans la rangée centrale.
-- **1024–1439 px** : hero en trois colonnes ; projets sur toute la largeur, puis compétences et Memory Card.
-- **768–1023 px** : hero en deux colonnes, navigation dépliable, panneaux réorganisés.
+- **1024–1439 px** : hero en trois colonnes ; projets, compétences et Memory Card restent sur une seule ligne, avec des dimensions internes adaptées aux petits écrans PC.
+- **768–1023 px** : hero en deux colonnes, navigation dépliable, projets sur toute la largeur puis compétences et Memory Card côte à côte.
 - **Moins de 768 px** : ordre vertical, projets en deux colonnes, puis une colonne sous 360 px.
 
 `App.module.css` et `Hero.module.css` pilotent les grilles. Les règles locales adaptent les composants aux mêmes seuils. Quelques ajustements de densité complètent ces seuils : le sous-titre du logo disparaît sous 1600 px, et les micro-libellés décoratifs disparaissent dans les en-têtes étroits via une container query.

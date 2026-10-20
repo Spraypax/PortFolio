@@ -11,7 +11,7 @@
   max-width: 1920px;
   min-height: var(--header-height);
   margin: auto;
-  padding: 10px var(--page-gutter);
+  padding: 6px var(--page-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 10px;
+  padding: 5px 10px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   background: rgb(20 42 78 / 28%);
