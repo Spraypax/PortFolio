@@ -2,7 +2,7 @@
 
 Base de portfolio personnel inspirée des interfaces PlayStation et PSP : fond bleu nuit, panneaux translucides, typographie technologique et composition modulaire.
 
-**Phase 1 — base du portfolio.** Les initiales, la localisation et le CV sont personnalisés. Les autres textes, les projets, les niveaux de compétences, les statistiques et l'expérience restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
+**Phase 1 — base du portfolio.** Les initiales, le rôle, la localisation, l'introduction, les étiquettes du profil et le CV sont personnalisés. Les autres textes, les projets, les niveaux de compétences, les statistiques et le reste de l'expérience restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
 
 ## Lancer le projet
 

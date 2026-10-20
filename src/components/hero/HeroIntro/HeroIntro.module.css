@@ -46,7 +46,7 @@
     padding: 25px 0 15px;
   }
   .intro h1 {
-    font-size: clamp(2.4rem, 9.5vw, 4rem);
+    font-size: clamp(2rem, 9.5vw, 4rem);
   }
   .description {
     max-width: 340px;

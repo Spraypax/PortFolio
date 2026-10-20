@@ -5,7 +5,7 @@ export const experience: Experience[] = [
   {
     id: 'creative',
     period: '2024 — Present',
-    role: 'Freelance Creative Developer',
+    role: 'Cybersecurity student',
     description: 'Web experiences, interactive media, brand sites.',
   },
   {

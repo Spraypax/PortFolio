@@ -1,9 +1,9 @@
 import cvUrl from '../assets/documents/DUPONT_Lelian_CV_ATS.pdf?url'
 
-// Initials, location and CV are personalized; the remaining copy is still illustrative.
+// Profile details, introduction, tags and CV are personalized; the bio remains illustrative.
 export const profile = {
   name: 'L.D',
-  role: 'Creative Developer',
+  role: 'Cybersecurity student',
   location: 'Paris, FR',
   cv: {
     url: cvUrl,
@@ -11,8 +11,7 @@ export const profile = {
   },
   description:
     'Blending design, code and a little curiosity. I create digital experiences inspired by games, technology and the things that make us feel something.',
-  tags: ['Web Development', 'UI/UX Design', 'Creative Tech', 'Games', '3D & Motion'],
-  heroLines: ['Creative', 'developer', 'for a more', 'playful web'],
-  introduction:
-    'Blending code, design and storytelling to build digital experiences that feel like games.',
+  tags: ['Systems & Network Admin', 'Azure', 'SOC', 'Cloud infrastructure', 'Active Directory'],
+  heroLines: ['Cybersecurity', 'student'],
+  introduction: 'Strong interest in Cloud Computing, Pentesting and Database Administration.',
 }
