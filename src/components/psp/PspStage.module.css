@@ -1,0 +1,21 @@
+.stage {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  aspect-ratio: 2.3;
+  align-self: center;
+  isolation: isolate;
+}
+
+.mount {
+  position: absolute;
+  inset: 0;
+  /* Future layers use this single coordinate system; do not clip shell reflections. */
+}
+
+@media (max-width: 1023px) {
+  /* The empty reservation is unnecessary in the stacked phase-1 layout. */
+  .stage {
+    display: none;
+  }
+}

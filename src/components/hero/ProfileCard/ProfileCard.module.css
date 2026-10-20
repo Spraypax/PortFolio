@@ -1,0 +1,55 @@
+.card {
+  align-self: center;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(80px, 0.85fr) minmax(0, 1.45fr);
+  gap: 15px;
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 0.9;
+  border: 1px solid rgb(137 179 255 / 48%);
+  border-radius: 6px;
+  background: rgb(5 16 37 / 28%);
+  box-shadow: inset 0 0 16px rgb(0 5 18 / 20%);
+}
+
+.info h3 {
+  margin-bottom: 3px;
+  font: 400 1.35rem var(--font-display);
+  letter-spacing: 0.06em;
+}
+
+.role {
+  font: 0.82rem / 1.5 var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 10px;
+  color: #bbcbeb;
+  font-size: 0.69rem;
+}
+
+.location svg {
+  color: var(--color-purple);
+}
+
+.description {
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.75;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+}

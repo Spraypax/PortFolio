@@ -1,0 +1,95 @@
+.card {
+  min-width: 0;
+}
+
+.cover {
+  position: relative;
+  aspect-ratio: 1.3;
+  overflow: hidden;
+  border: 1px solid #4a6998;
+  border-radius: 5px;
+  background: #040a16;
+  box-shadow: 0 5px 12px rgb(0 0 0 / 20%);
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.card:hover .cover {
+  transform: translateY(-3px);
+  border-color: var(--color-blue-300);
+}
+
+.artwork {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spine {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 15%;
+  overflow: hidden;
+  background: #050609;
+  border-right: 1px solid #647390;
+}
+
+.spine img {
+  position: absolute;
+  top: -5%;
+  left: -55%;
+  width: 210%;
+  max-width: none;
+  height: 110%;
+}
+
+.demo {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 5px;
+  border: 1px solid rgb(157 181 255 / 30%);
+  border-radius: 2px;
+  background: rgb(3 8 25 / 60%);
+  color: #c7d9f8;
+  font: 0.5rem / 1.6 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card h3 {
+  margin: 10px 0 3px;
+  font: 500 0.91rem var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+.card p {
+  min-height: 2.9em;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  color: var(--color-blue-300);
+  font-size: 0.75rem;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+}

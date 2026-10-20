@@ -1,0 +1,29 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource/oxanium/latin-400.css';
+@import '@fontsource/oxanium/latin-500.css';
+@import '@fontsource/oxanium/latin-600.css';
+
+body {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+::selection {
+  color: white;
+  background: #3669ad;
+}

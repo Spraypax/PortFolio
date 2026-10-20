@@ -1,0 +1,37 @@
+.content {
+  display: flex;
+  gap: 17px;
+  align-items: flex-start;
+}
+.mail {
+  flex-shrink: 0;
+  color: #a295ff;
+  filter: drop-shadow(0 0 8px rgb(138 106 255 / 30%));
+}
+.content h3 {
+  font-size: 0.74rem;
+  line-height: 1.6;
+  margin-bottom: 5px;
+}
+.content p {
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 15px;
+  margin-top: 16px;
+}
+.socials {
+  display: flex;
+  gap: 2px;
+}
+.placeholder {
+  margin-top: 7px;
+  color: var(--color-text-muted);
+  font: 0.56rem var(--font-display);
+  letter-spacing: 0.04em;
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#102b7f"/><stop offset=".5" stop-color="#7466c6"/><stop offset="1" stop-color="#fa9bb0"/></linearGradient>
+    <linearGradient id="water" x2="0" y2="1"><stop stop-color="#8578c5"/><stop offset="1" stop-color="#122459"/></linearGradient>
+    <pattern id="windows" width="13" height="18" patternUnits="userSpaceOnUse"><rect width="3" height="5" x="5" y="5" fill="#9eb3ff" opacity=".6"/></pattern>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h400v300H0z"/>
+  <circle cx="302" cy="138" r="33" fill="#f1b1bf"/>
+  <g fill="#eeb0d0" opacity=".45"><path d="m40 84 92-9 55 7-80 5zM201 53l86-9 85 7-72 4zM169 119l48-6 29 5-52 5z"/></g>
+  <g fill="#ccd5ff"><circle cx="85" cy="31" r="1"/><circle cx="154" cy="39" r="1.2"/><circle cx="267" cy="24" r="1"/><circle cx="358" cy="82" r="1"/></g>
+  <path d="M0 205h40v-28h18v-19h21v28h21v-53h15v-17h12v-41h4v41h13v95h23v-33h29v-19h17v31h18v-13h27v29h18v-53h32v26h23v-14h21v37h48v99H0z" fill="#29316d"/>
+  <path d="M0 232h400v68H0z" fill="url(#water)"/>
+  <path d="M63 300V182h34v118m16 0V137h35v163m18 0V203h48v97m28 0V218h38v82m33 0V188h39v112" fill="#0e1e4d"/>
+  <path d="M63 300V182h34v118m16 0V137h35v163m18 0V203h48v97m28 0V218h38v82m33 0V188h39v112" fill="url(#windows)"/>
+  <path d="m130 137 1-79 2 79M221 249h65m-59 9h49m-29 10h53" stroke="#ffb3db" stroke-width="2" opacity=".65"/>
+</svg>

@@ -1,0 +1,22 @@
+.panel {
+  position: relative;
+  z-index: var(--z-panel);
+  min-width: 0;
+  padding: clamp(1rem, 1.2vw, 1.4rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(130deg, rgb(100 137 209 / 12%), transparent 55%), var(--color-panel);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(15px);
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: 18%;
+  left: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(160 202 255 / 40%), transparent);
+  pointer-events: none;
+}

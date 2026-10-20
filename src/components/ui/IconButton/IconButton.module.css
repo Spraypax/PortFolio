@@ -1,0 +1,21 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-blue-300);
+  transition: background var(--transition-fast);
+}
+
+a.button:hover {
+  background: rgb(90 155 255 / 18%);
+}
+
+.button:disabled {
+  color: #91acd4;
+}

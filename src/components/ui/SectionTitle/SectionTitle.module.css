@@ -1,0 +1,40 @@
+.row {
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 18px;
+  margin-bottom: 1.1rem;
+}
+
+.title {
+  flex-shrink: 0;
+  color: var(--color-blue-300);
+  font: 400 0.83rem / 1.3 var(--font-display);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.title span {
+  margin-right: 5px;
+  color: #c1d8ff;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-border), rgb(110 159 255 / 6%));
+}
+
+.detail {
+  color: var(--color-text-secondary);
+  font: 0.7rem var(--font-display);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+@container (max-width: 280px) {
+  .detail {
+    display: none;
+  }
+}

@@ -1,0 +1,42 @@
+:root {
+  color-scheme: dark;
+  --color-bg-950: #020611;
+  --color-bg-900: #030816;
+  --color-bg-800: #081a38;
+  --color-panel: rgb(8 24 52 / 72%);
+  --color-panel-hover: rgb(20 43 80 / 82%);
+  --color-blue-300: #9bc8ff;
+  --color-blue-400: #64adff;
+  --color-blue-500: #3a8dff;
+  --color-cyan: #64c7ff;
+  --color-purple: #9385ff;
+  --color-text-primary: #edf5ff;
+  --color-text-secondary: #b3c5e0;
+  --color-text-muted: #91aacd;
+  --color-border: rgb(115 165 255 / 30%);
+  --color-border-active: #73b4ff;
+  --shadow-panel: 0 12px 35px rgb(0 3 15 / 24%), inset 0 1px 0 rgb(190 218 255 / 8%);
+  --shadow-panel-hover: 0 12px 30px rgb(0 3 15 / 30%), 0 0 20px rgb(58 141 255 / 10%);
+  --glow-blue: 0 0 20px rgb(40 123 255 / 38%);
+  --glow-purple: 0 0 12px rgb(147 133 255 / 32%);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --radius-sm: 4px;
+  --radius-panel: 8px;
+  --transition-fast: 180ms ease;
+  --transition-base: 280ms ease;
+  --font-body: 'Inter Variable', sans-serif;
+  --font-display: 'Oxanium', sans-serif;
+  --page-gutter: clamp(1rem, 2.2vw, 2.75rem);
+  --header-height: 82px;
+  --z-background: -1;
+  --z-content: 0;
+  --z-panel: 1;
+  --z-navigation: 10;
+  --z-overlay: 20;
+  /* Shared breakpoints: mobile <768, tablet 768–1023, laptop 1024–1439, desktop >=1440. */
+}

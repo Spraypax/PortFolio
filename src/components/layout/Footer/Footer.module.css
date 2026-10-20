@@ -1,0 +1,34 @@
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 19px 2px;
+  color: #b0c9ec;
+}
+.footer p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 0.59rem var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+.footer .demo {
+  font-size: 0.53rem;
+  color: #9eb7d9;
+}
+.line {
+  width: 20px;
+  height: 1px;
+  background: #90acd4;
+}
+
+@media (max-width: 767px) {
+  .footer {
+    flex-wrap: wrap;
+  }
+  .footer > p:last-child {
+    display: none;
+  }
+}
