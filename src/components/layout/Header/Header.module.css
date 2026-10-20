@@ -2,23 +2,24 @@
   position: sticky;
   top: 0;
   z-index: var(--z-navigation);
-  border-bottom: 1px solid var(--color-border);
-  background: rgb(3 9 22 / 85%);
-  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgb(115 165 255 / 22%);
+  background: transparent;
 }
 
 .inner {
   max-width: 1920px;
   min-height: var(--header-height);
   margin: auto;
-  padding: 6px var(--page-gutter);
-  display: flex;
+  padding: 4px var(--page-gutter);
+  display: grid;
+  grid-template-columns: clamp(300px, 20vw, 340px) max-content minmax(0, 1fr) 324px 220px;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  column-gap: 16px;
 }
 
 .brand {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -45,68 +46,15 @@
   text-transform: uppercase;
 }
 
-.music {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: rgb(20 42 78 / 28%);
-}
-
-.album {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 35px;
-  border: 1px solid #3b6091;
-  border-radius: 3px;
-  background: linear-gradient(130deg, #071328, #173f75);
-  color: var(--color-blue-300);
-}
-
-.micro,
-.track {
-  display: block;
-  white-space: nowrap;
-}
-
-.micro {
-  color: var(--color-text-muted);
-  font-size: 0.56rem;
-  letter-spacing: 0.05em;
-}
-
-.track {
-  font: 0.69rem / 1.8 var(--font-display);
-}
-
-.wave {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 25px;
-  margin-left: 8px;
-}
-
-.wave i {
-  width: 3px;
-  height: 7px;
-  background: #4a91e4;
-}
-
-.wave i:nth-child(2n) {
-  height: 14px;
-}
-.wave i:nth-child(3n) {
-  height: 20px;
-}
-.wave i:nth-child(4n) {
-  height: 25px;
+.musicSlot {
+  grid-column: 4;
+  grid-row: 1;
+  min-width: 0;
 }
 
 .clock {
+  grid-column: 5;
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -132,21 +80,54 @@
 }
 
 @media (max-width: 1599px) {
-  .brandCopy {
-    display: none;
+  .inner {
+    grid-template-columns: max-content max-content minmax(0, 1fr) 300px max-content;
+    column-gap: 14px;
   }
-  .wave {
+  .brandCopy {
     display: none;
   }
 }
 
-@media (max-width: 1439px) {
-  .music {
-    display: none;
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .inner {
+    grid-template-columns: max-content max-content minmax(0, 1fr) 240px max-content;
+    column-gap: 10px;
+  }
+  .brand {
+    gap: 9px;
+  }
+  .brand img {
+    width: 35px;
+    height: 35px;
+  }
+  .name {
+    font-size: 1.5rem;
+  }
+  .clock {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 8px;
+    font-size: 0.66rem;
+    text-align: right;
+  }
+  .clock span {
+    grid-column: 1;
+  }
+  .clock svg {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 }
 
 @media (max-width: 1023px) {
+  .inner {
+    display: flex;
+    gap: 20px;
+  }
+  .musicSlot {
+    display: none;
+  }
   .toggle {
     display: grid;
   }

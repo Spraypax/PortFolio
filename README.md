@@ -49,6 +49,7 @@ src/
 │   ├── ui/                    # Button, Panel, Tag, SectionTitle, IconButton
 │   ├── hero/                  # Hero, HeroIntro, ProfileCard
 │   ├── psp/                   # PspStage vide uniquement
+│   ├── music/                 # Aperçu visuel du lecteur, sans lecture audio
 │   ├── projects/              # FeaturedProjects, ProjectCard
 │   ├── skills/                # SkillsPanel, SkillBar
 │   ├── memory/                # MemoryCardPanel
@@ -110,7 +111,7 @@ Les principaux seuils sont identiques dans les composants :
 - **768–1023 px** : hero en deux colonnes, navigation dépliable, projets sur toute la largeur puis compétences et Memory Card côte à côte.
 - **Moins de 768 px** : ordre vertical, projets en deux colonnes, puis une colonne sous 360 px.
 
-`App.module.css` et `Hero.module.css` pilotent les grilles. Les règles locales adaptent les composants aux mêmes seuils. Quelques ajustements de densité complètent ces seuils : le sous-titre du logo disparaît sous 1600 px, et les micro-libellés décoratifs disparaissent dans les en-têtes étroits via une container query.
+`App.module.css` et `Hero.module.css` pilotent les grilles. Les règles locales adaptent les composants aux mêmes seuils. Quelques ajustements de densité complètent ces seuils : le sous-titre du logo disparaît sous 1600 px, le lecteur est plus compact sous 1200 px, et les micro-libellés décoratifs disparaissent dans les en-têtes étroits via une container query.
 
 Les tokens de couleurs, espacements, ombres, rayons, transitions, hauteur de navigation et z-index sont centralisés dans `src/styles/variables.css`. L'échelle de profondeur est limitée à fond, contenu, panneaux, navigation et overlays ; chaque futur assemblage PSP aura son propre contexte d'empilement.
 
@@ -139,7 +140,9 @@ Ce composant réserve uniquement un emplacement responsive de ratio 2,3:1, avec 
 
 Plus tard, ce point de montage pourra accueillir les exports Blender superposés (`PspShell`, reflets, boutons), un véritable écran React (`PspScreen`, `PspMenu`) et les commandes (`PspControls`, `PspButton`). Les interactions souris, clavier et Gamepad API seront implémentées à cette étape seulement, sans Three.js.
 
-La zone musique du header est également une réservation visuelle marquée **Coming soon**, sans lecture audio ni faux contrôle actif.
+La navbar est transparente, sans flou ni aplat de couleur, et laisse apparaître le fond global sous son trait de séparation. Sa grille place les liens près du logo, puis le lecteur musical avant l'horloge.
+
+`MusicPlayerPreview` reprend le cadre bleu du template, le libellé **Now Playing**, une vignette temporaire issue du visuel Orbit, le titre, les pictogrammes de lecture et un égaliseur statique. Il reste purement visuel : aucun bouton actif, animation de lecture ou chargement audio. Son nom accessible précise que la lecture n'est pas encore disponible. Le lecteur est visible dès 1024 px ; sur les petits écrans PC, sa présentation se compacte, et il est masqué sur tablette et mobile.
 
 ## Vérification
 

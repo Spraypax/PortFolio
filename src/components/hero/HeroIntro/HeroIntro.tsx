@@ -6,9 +6,6 @@ import styles from './HeroIntro.module.css'
 export function HeroIntro() {
   return (
     <div className={styles.intro}>
-      <p className={styles.eyebrow}>
-        <span aria-hidden="true" /> Code. Create. Play.
-      </p>
       <h1>
         {profile.heroLines.map((line) => (
           <span key={line}>{line}</span>

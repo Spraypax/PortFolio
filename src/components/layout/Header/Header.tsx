@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { BatteryFull, Menu, Music2, X } from 'lucide-react'
+import { BatteryFull, Menu, X } from 'lucide-react'
 import logo from '../../../assets/images/playstation/playstation-logo.png'
 import { profile } from '../../../data/profile'
 import { useClock } from '../../../hooks/useClock'
 import { Navigation } from '../Navigation/Navigation'
+import { MusicPlayerPreview } from '../../music/MusicPlayerPreview/MusicPlayerPreview'
 import styles from './Header.module.css'
 
 export function Header() {
@@ -60,27 +61,8 @@ export function Header() {
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
         <Navigation open={menuOpen} onNavigate={() => setMenuOpen(false)} />
-        <div
-          className={styles.music}
-          role="group"
-          aria-label="Music player — coming in a later phase"
-        >
-          <span className={styles.album}>
-            <Music2 size={19} aria-hidden="true" />
-          </span>
-          <span>
-            <span className={styles.micro}>Soundtrack / Coming soon</span>
-            <span className={styles.track}>Good Games, Better Ideas</span>
-          </span>
-          <span className={styles.wave} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
+        <div className={styles.musicSlot}>
+          <MusicPlayerPreview />
         </div>
         <time className={styles.clock} dateTime={clock.iso}>
           <span>{clock.date}</span>

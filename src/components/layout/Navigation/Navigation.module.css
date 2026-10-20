@@ -1,4 +1,6 @@
 .navigation {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   align-items: center;
   gap: clamp(0.15rem, 0.65vw, 0.8rem);
@@ -29,6 +31,16 @@
     0 0 16px rgb(58 141 255 / 12%),
     inset 0 0 8px rgb(58 141 255 / 8%);
   color: #a4d8ff;
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .navigation {
+    gap: 3px;
+  }
+  .navigation a {
+    padding-inline: 8px;
+    font-size: 0.69rem;
+  }
 }
 
 @media (max-width: 1023px) {
