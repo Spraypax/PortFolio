@@ -21,6 +21,11 @@
   margin-top: 16px;
 }
 
+.bottomGrid > :last-child {
+  /* Keep Contact on the right, leaving the background artwork visible in the center. */
+  grid-column: -2 / -1;
+}
+
 @media (min-width: 1920px) {
   .page {
     padding-top: 15px;
@@ -46,9 +51,6 @@
   }
   .bottomGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .bottomGrid > :first-child {
-    grid-column: 1 / -1;
   }
 }
 

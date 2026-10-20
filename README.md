@@ -2,7 +2,7 @@
 
 Base de portfolio personnel inspirée des interfaces PlayStation et PSP : fond bleu nuit, panneaux translucides, typographie technologique et composition modulaire.
 
-**Phase 1 — base du portfolio.** Les informations personnelles, les projets, les niveaux de compétences, les statistiques et l'expérience sont des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
+**Phase 1 — base du portfolio.** Les initiales, la localisation et le CV sont personnalisés. Les autres textes, les projets, les niveaux de compétences, les statistiques et l'expérience restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
 
 ## Lancer le projet
 
@@ -40,10 +40,12 @@ Pas de framework UI, de bibliothèque d'animation ou de moteur 3D.
 
 ```text
 src/
-├── assets/images/
-│   ├── backgrounds/           # Fond fourni
-│   ├── playstation/           # Memory Card, badge et logo fournis
-│   └── projects/              # Quatre illustrations SVG de démonstration
+├── assets/
+│   ├── documents/             # PDF du CV à télécharger
+│   └── images/
+│       ├── backgrounds/       # Fond fourni
+│       ├── playstation/       # Memory Card, badge et logo fournis
+│       └── projects/          # Quatre illustrations SVG de démonstration
 ├── components/
 │   ├── layout/                # Header, Navigation, Footer
 │   ├── ui/                    # Button, Panel, Tag, SectionTitle, IconButton
@@ -54,9 +56,8 @@ src/
 │   ├── skills/                # SkillsPanel, SkillBar
 │   ├── memory/                # MemoryCardPanel
 │   ├── experience/            # ExperiencePanel
-│   ├── editorial/             # EditorialPanel
 │   └── contact/               # ContactPanel
-├── data/                      # Contenus temporaires
+├── data/                      # Profil et contenus de démonstration
 ├── hooks/                     # Horloge et détection d'entrée dans le viewport
 ├── styles/                    # Reset, variables, typographie et styles globaux
 ├── types/                     # Project, Skill, Experience
@@ -71,7 +72,7 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 
 | Fichier                   | Contenu                                                       |
 | ------------------------- | ------------------------------------------------------------- |
-| `src/data/profile.ts`     | Nom, rôle, localisation, introduction et tags                 |
+| `src/data/profile.ts`     | Nom, rôle, localisation, CV, introduction et tags             |
 | `src/data/navigation.ts`  | Liens et libellés de navigation                               |
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
 | `src/data/skills.ts`      | Compétences, icônes, valeurs et couleurs                      |
@@ -99,6 +100,8 @@ La Memory Card est une image indépendante, jamais reconstruite en CSS. Le badge
 **Avatar :** lors d'une phase ultérieure, créer `src/assets/images/profile/avatar.png`, puis intégrer explicitement l'image dans `ProfileCard`. Ce dossier n'est pas créé artificiellement tant qu'il est vide. **Déposer un fichier à cet emplacement ne l'affiche pas automatiquement : le cadre est volontairement vide dans cette première version.**
 
 Les quatre couvertures de projets sont des illustrations SVG locales temporaires. Les remplacer en important les nouveaux visuels dans `src/data/projects.ts`. Il n'y a aucune image distante ni dépendance aux fichiers du dossier Téléchargements.
+
+**CV :** le document fourni est copié à l'identique dans `src/assets/documents/DUPONT_Lelian_CV_ATS.pdf`. Le bouton **Download CV** utilise un lien natif avec l'attribut `download` et conserve le nom `DUPONT_Lélian_CV_ATS.pdf` lors du téléchargement. Le PDF est importé par Vite et inclus dans le build. Pour le mettre à jour, remplacer ce fichier ; son URL et le nom proposé au téléchargement sont centralisés dans `src/data/profile.ts`.
 
 Les PNG originaux représentent environ 5,3 Mo. Ils sont conservés intacts ; des exports WebP/AVIF adaptés aux dimensions d'affichage pourront réduire ce poids lors de la phase d'optimisation. Les images de contenu ont des dimensions explicites et les images des panneaux utilisent le chargement différé.
 

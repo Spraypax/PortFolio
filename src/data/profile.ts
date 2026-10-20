@@ -1,8 +1,14 @@
-// Phase 1: illustrative content only. Replace with your own information in phase 2.
+import cvUrl from '../assets/documents/DUPONT_Lelian_CV_ATS.pdf?url'
+
+// Initials, location and CV are personalized; the remaining copy is still illustrative.
 export const profile = {
-  name: 'T.K.',
+  name: 'L.D',
   role: 'Creative Developer',
-  location: 'Tokyo, JP',
+  location: 'Paris, FR',
+  cv: {
+    url: cvUrl,
+    filename: 'DUPONT_Lélian_CV_ATS.pdf',
+  },
   description:
     'Blending design, code and a little curiosity. I create digital experiences inspired by games, technology and the things that make us feel something.',
   tags: ['Web Development', 'UI/UX Design', 'Creative Tech', 'Games', '3D & Motion'],

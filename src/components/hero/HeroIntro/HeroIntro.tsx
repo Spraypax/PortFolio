@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { profile } from '../../../data/profile'
 import { Button } from '../../ui/Button/Button'
 import styles from './HeroIntro.module.css'
@@ -16,8 +16,8 @@ export function HeroIntro() {
         ///
       </span>
       <div className={styles.actions}>
-        <Button href="#projects">
-          View my work <ArrowRight size={16} aria-hidden="true" />
+        <Button href={profile.cv.url} download={profile.cv.filename}>
+          Download CV <Download size={16} aria-hidden="true" />
         </Button>
         <Button href="#about" variant="secondary">
           About me

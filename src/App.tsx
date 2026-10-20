@@ -5,7 +5,6 @@ import { FeaturedProjects } from './components/projects/FeaturedProjects/Feature
 import { SkillsPanel } from './components/skills/SkillsPanel/SkillsPanel'
 import { MemoryCardPanel } from './components/memory/MemoryCardPanel/MemoryCardPanel'
 import { ExperiencePanel } from './components/experience/ExperiencePanel/ExperiencePanel'
-import { EditorialPanel } from './components/editorial/EditorialPanel/EditorialPanel'
 import { ContactPanel } from './components/contact/ContactPanel/ContactPanel'
 import styles from './App.module.css'
 
@@ -26,7 +25,6 @@ export default function App() {
           </div>
           <div className={styles.bottomGrid}>
             <ExperiencePanel />
-            <EditorialPanel />
             <ContactPanel />
           </div>
         </main>
