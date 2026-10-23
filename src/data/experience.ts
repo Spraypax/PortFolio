@@ -1,4 +1,4 @@
-import type { Experience } from '../types/experience'
+import type { Experience, ExperienceCategory } from '../types/experience'
 
 // Experience details provided by the portfolio owner.
 export const experience: Experience[] = [
@@ -20,4 +20,10 @@ export const experience: Experience[] = [
     role: 'IT and Network Maintenance Technician',
     description: 'Presentive and corrrective maintenance of IT equipment',
   },
+]
+
+// Expanded sections are intentionally empty until their content is provided.
+export const experienceCategories: ExperienceCategory[] = [
+  { id: 'professional', title: 'Professional Experience' },
+  { id: 'academic', title: 'Academic Path' },
 ]

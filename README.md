@@ -48,7 +48,7 @@ src/
 │       └── projects/          # Quatre illustrations SVG de démonstration
 ├── components/
 │   ├── layout/                # Header, Navigation, Footer
-│   ├── ui/                    # Button, Panel, Tag, SectionTitle, IconButton
+│   ├── ui/                    # UI partagée, ExpandablePanel et AccordionItem
 │   ├── hero/                  # Hero, HeroIntro, ProfileCard
 │   ├── psp/                   # PspStage vide uniquement
 │   ├── music/                 # Aperçu visuel du lecteur, sans lecture audio
@@ -60,13 +60,13 @@ src/
 ├── data/                      # Profil et contenus de démonstration
 ├── hooks/                     # Horloge et panneau agrandissable
 ├── styles/                    # Reset, variables, typographie et styles globaux
-├── types/                     # Project, SkillCategory, Experience
+├── types/                     # Project, SkillCategory, Experience, ExperienceCategory
 ├── App.tsx                    # Composition de la page uniquement
 ├── App.module.css             # Grilles principales et réorganisation responsive
 └── main.tsx
 ```
 
-Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionTitle` et `IconButton` constituent le petit design system réutilisable. Les composants ne contiennent pas de copies des listes de données.
+Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionTitle` et `IconButton` constituent le petit design system réutilisable. `ExpandablePanel` et `AccordionItem` partagent la structure et les styles d'agrandissement et d'accordéon entre Skills et Experience. Les composants ne contiennent pas de copies des listes de données.
 
 ## Modifier le contenu
 
@@ -76,7 +76,7 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 | `src/data/navigation.ts`  | Liens et libellés de navigation                               |
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
 | `src/data/skills.ts`      | Titres, icônes et compétences des six catégories              |
-| `src/data/experience.ts`  | Périodes, postes et descriptions                              |
+| `src/data/experience.ts`  | Chronologie compacte et catégories du panneau agrandi         |
 | `src/data/memory.ts`      | Nom de sauvegarde, date et compteurs                          |
 | `src/data/socialLinks.ts` | Texte de contact, adresse email et réseaux sociaux            |
 
@@ -126,7 +126,7 @@ L'accessibilité comprend :
 - Lien d'évitement vers le contenu et focus visible.
 - Navigation mobile au clavier, fermeture avec Échap et retour du focus.
 - Textes alternatifs pour les images utiles, images décoratives ignorées.
-- Panneau Skills modal natif, focus contenu dans le panneau, fermeture par Échap et retour du focus au déclencheur.
+- Panneaux Skills et Experience modaux natifs, focus contenu dans le panneau, fermeture par Échap et retour du focus au déclencheur.
 - Accordéons indépendants avec `aria-expanded`, désactivés jusqu'à la fin de l'agrandissement.
 - Prise en compte de `prefers-reduced-motion` pour les animations, les transitions et le défilement.
 
@@ -139,6 +139,12 @@ Le format compact affiche uniquement les six catégories et leurs chevrons, sans
 `useExpandingDialog` gère les phases fermé, ouverture, ouvert et fermeture avec la Web Animations API. Les catégories ne deviennent utilisables qu'après la fin effective de l'animation. La croix et Échap ferment le panneau avec une animation inverse ; la page retrouve son défilement et le focus revient au bouton Skills. Les animations respectent la préférence de réduction des mouvements.
 
 Chaque `SkillCategory` possède son propre état d'ouverture et affiche ses compétences sous forme de tags discrets. Les six icônes Lucide monochromes sont visibles uniquement dans le grand panneau ; le format compact conserve seulement les titres et les chevrons. Les titres, les icônes et les listes de compétences sont centralisés dans `src/data/skills.ts`. Plusieurs catégories peuvent être ouvertes simultanément et elles sont toutes refermées lors d'une nouvelle ouverture du panneau. Sur les petits écrans, le panneau occupe presque toute la fenêtre et les catégories défilent sous son en-tête.
+
+## Panneau Experience
+
+La chronologie compacte conserve sa présentation, ses dimensions et ses données actuelles. Toute la carte ouvre un grand panneau via le même composant `ExpandablePanel` que Skills : animation depuis la carte, croix de fermeture, Échap, verrouillage du défilement de fond et retour du focus.
+
+Les catégories **Professional Experience** et **Academic Path**, définies dans `src/data/experience.ts`, sont visibles uniquement dans le grand panneau et deviennent interactives après la fin de l'agrandissement. Elles utilisent `AccordionItem`, comme Skills, avec des chevrons animés et des ouvertures indépendantes. Leurs contenus restent volontairement vides. Chaque réouverture du panneau remet les deux catégories à l'état fermé.
 
 ## Future intégration PSP 2.5D
 
@@ -161,3 +167,5 @@ La navbar est transparente, sans flou ni aplat de couleur, et laisse apparaître
 Le build exécute TypeScript avant Vite. Vérifier également `npm run lint`, `npm run format:check`, les six ancres, la navigation mobile au clavier, l'absence de défilement horizontal aux principaux breakpoints, le cadre photo vide et l'absence de contenu dans `PspStage`.
 
 Pour Skills : vérifier l'absence des anciennes jauges, le mode compact non déroulable, le verrouillage pendant l'agrandissement, l'ouverture simultanée de plusieurs catégories, la fermeture par croix et Échap, le retour du focus et le défilement du panneau sur mobile.
+
+Pour Experience : vérifier la conservation de la chronologie compacte, les deux menus uniquement dans le panneau agrandi, leurs contenus vides, le verrouillage pendant l'ouverture, les ouvertures indépendantes, la fermeture et le retour du focus. Contrôler également Skills après une modification des composants partagés.
