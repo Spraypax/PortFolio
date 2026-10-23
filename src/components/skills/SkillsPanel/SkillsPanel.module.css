@@ -1,7 +1,13 @@
 .compact {
+  display: flex;
+  flex-direction: column;
   transition:
     border-color var(--transition-base),
     box-shadow var(--transition-base);
+}
+
+.compact > :first-child {
+  margin-bottom: 0;
 }
 
 .compact:hover {
@@ -10,7 +16,9 @@
 }
 
 .preview {
+  flex: 1;
   display: grid;
+  align-content: space-between;
   gap: 17px;
   list-style: none;
   margin: 22px 0 0;
