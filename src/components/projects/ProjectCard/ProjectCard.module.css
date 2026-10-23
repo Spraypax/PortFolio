@@ -26,6 +26,11 @@
   object-fit: cover;
 }
 
+.centeredArtwork {
+  /* Half the spine width centers the subject in the visible artwork area. */
+  transform: translateX(7.5%);
+}
+
 .spine {
   position: absolute;
   inset: 0 auto 0 0;

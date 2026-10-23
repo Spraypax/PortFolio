@@ -17,7 +17,7 @@ export function ProjectCard({
       <div className={styles.cover}>
         {project.image && (
           <img
-            className={styles.artwork}
+            className={`${styles.artwork} ${project.id === 'honeypot' && showPlaystationBadge ? styles.centeredArtwork : ''}`}
             src={project.image}
             alt={project.imageAlt}
             width={400}

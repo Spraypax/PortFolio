@@ -1,4 +1,4 @@
-import skyline from '../assets/images/projects/skyline.svg'
+import honeypot from '../assets/images/projects/honeypot.png'
 import garden from '../assets/images/projects/pixel-garden.svg'
 import echoes from '../assets/images/projects/echoes.svg'
 import orbit from '../assets/images/projects/orbit.svg'
@@ -7,12 +7,12 @@ import type { Project } from '../types/project'
 // Sample projects and original placeholder illustrations; no fabricated external links.
 export const projects: Project[] = [
   {
-    id: 'skyline',
-    title: 'Skyline',
+    id: 'honeypot',
+    title: 'Honeypot',
     description: 'A dreamy portfolio theme inspired by city pop.',
-    image: skyline,
-    imageAlt: 'Illustrated city skyline beneath a pink and blue evening sky',
-    tags: ['Web Design', 'Frontend'],
+    image: honeypot,
+    imageAlt: 'Golden honey flowing from a wooden dipper into a glass jar',
+    tags: ['Go', 'Frontend'],
     category: 'Website',
     showPlaystationBadge: true,
     isPlaceholder: true,
