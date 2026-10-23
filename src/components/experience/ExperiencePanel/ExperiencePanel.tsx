@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { experience, experienceCategories } from '../../../data/experience'
 import { AccordionItem } from '../../ui/AccordionItem/AccordionItem'
 import { ExpandablePanel } from '../../ui/ExpandablePanel/ExpandablePanel'
+import { ExperienceTimeline } from '../ExperienceTimeline/ExperienceTimeline'
 import styles from './ExperiencePanel.module.css'
 
 export function ExperiencePanel() {
@@ -47,7 +48,13 @@ export function ExperiencePanel() {
             expanded={expandedCategories.has(category.id)}
             disabled={!interactive}
             onToggle={() => toggleCategory(category.id)}
-          />
+          >
+            <ExperienceTimeline
+              entries={category.entries}
+              expanded={expandedCategories.has(category.id)}
+              label={`${category.title} timeline`}
+            />
+          </AccordionItem>
         ))
       }
     </ExpandablePanel>

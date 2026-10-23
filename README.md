@@ -2,7 +2,7 @@
 
 Base de portfolio personnel inspirée des interfaces PlayStation et PSP : fond bleu nuit, panneaux translucides, typographie technologique et composition modulaire.
 
-**Phase 1 — base du portfolio.** Les initiales, le rôle, la localisation, l'introduction, les étiquettes du profil et le CV sont personnalisés. Les autres textes, les projets, les niveaux de compétences, les statistiques et le reste de l'expérience restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
+**Phase 1 — base du portfolio.** Les initiales, le rôle, la localisation, la biographie, l'introduction, les compétences, les étiquettes du profil, le parcours et le CV sont personnalisés. Les autres textes, les projets et les statistiques restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
 
 ## Lancer le projet
 
@@ -55,7 +55,7 @@ src/
 │   ├── projects/              # FeaturedProjects, ProjectCard
 │   ├── skills/                # SkillsPanel et accordéons SkillCategory
 │   ├── memory/                # MemoryCardPanel
-│   ├── experience/            # ExperiencePanel
+│   ├── experience/            # ExperiencePanel et frises ExperienceTimeline
 │   └── contact/               # ContactPanel
 ├── data/                      # Profil et contenus de démonstration
 ├── hooks/                     # Horloge et panneau agrandissable
@@ -76,7 +76,7 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 | `src/data/navigation.ts`  | Liens et libellés de navigation                               |
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
 | `src/data/skills.ts`      | Titres, icônes et compétences des six catégories              |
-| `src/data/experience.ts`  | Chronologie compacte et catégories du panneau agrandi         |
+| `src/data/experience.ts`  | Chronologie compacte, catégories et parcours détaillés        |
 | `src/data/memory.ts`      | Nom de sauvegarde, date et compteurs                          |
 | `src/data/socialLinks.ts` | Texte de contact, adresse email et réseaux sociaux            |
 
@@ -144,7 +144,9 @@ Chaque `SkillCategory` possède son propre état d'ouverture et affiche ses comp
 
 La chronologie compacte conserve sa présentation, ses dimensions et ses données actuelles. Toute la carte ouvre un grand panneau via le même composant `ExpandablePanel` que Skills : animation depuis la carte, croix de fermeture, Échap, verrouillage du défilement de fond et retour du focus.
 
-Les catégories **Professional Experience** et **Academic Path**, définies dans `src/data/experience.ts`, sont visibles uniquement dans le grand panneau et deviennent interactives après la fin de l'agrandissement. Elles utilisent `AccordionItem`, comme Skills, avec des chevrons animés et des ouvertures indépendantes. Une mallette et une toque universitaire Lucide monochromes accompagnent leurs titres, uniquement dans cette version agrandie. Leurs contenus restent volontairement vides. Chaque réouverture du panneau remet les deux catégories à l'état fermé.
+Les catégories **Professional Experience** et **Academic Path**, définies dans `src/data/experience.ts`, sont visibles uniquement dans le grand panneau et deviennent interactives après la fin de l'agrandissement. Elles utilisent `AccordionItem`, comme Skills, avec des chevrons animés et des ouvertures indépendantes. Une mallette et une toque universitaire Lucide monochromes accompagnent leurs titres, uniquement dans cette version agrandie. Chaque réouverture du panneau remet les deux catégories à l'état fermé.
+
+`ExperienceTimeline` affiche les trois expériences et les trois formations de la plus récente à la plus ancienne, avec une ligne verticale unique, un marqueur par étape et des textes placés à droite, y compris sur mobile. Les dates, le contexte, l'établissement, la localisation, la spécialisation et les missions sont fournis par les données, sans déduire les informations manquantes. Le poste chez MIF et le Master ESGI portent un badge **Ongoing** et un marqueur lumineux discret. Les étapes apparaissent progressivement à l'ouverture de leur catégorie ; la préférence de réduction des mouvements est respectée. La chronologie compacte reste indépendante des informations détaillées.
 
 ## Future intégration PSP 2.5D
 
@@ -168,4 +170,4 @@ Le build exécute TypeScript avant Vite. Vérifier également `npm run lint`, `n
 
 Pour Skills : vérifier l'absence des anciennes jauges, le mode compact non déroulable, le verrouillage pendant l'agrandissement, l'ouverture simultanée de plusieurs catégories, la fermeture par croix et Échap, le retour du focus et le défilement du panneau sur mobile.
 
-Pour Experience : vérifier la conservation de la chronologie compacte, les deux menus uniquement dans le panneau agrandi, leurs contenus vides, le verrouillage pendant l'ouverture, les ouvertures indépendantes, la fermeture et le retour du focus. Contrôler également Skills après une modification des composants partagés.
+Pour Experience : vérifier la conservation de la chronologie compacte, les deux menus uniquement dans le panneau agrandi, l'ordre des six étapes, les missions et les deux badges Ongoing, le masquage des frises repliées, le verrouillage pendant l'ouverture, les ouvertures indépendantes, la fermeture et le retour du focus. Vérifier le défilement vertical et l'absence de débordement des textes sur mobile. Contrôler également Skills après une modification des composants partagés.
