@@ -1,23 +1,23 @@
 import type { Experience } from '../types/experience'
 
-// Sample timeline, not a statement of the owner's professional experience.
+// Experience details provided by the portfolio owner.
 export const experience: Experience[] = [
   {
     id: 'creative',
     period: '2024 — Present',
-    role: 'Cybersecurity student',
-    description: 'Web experiences, interactive media, brand sites.',
+    role: 'Systems & Security Admin & DBA',
+    description: 'Azure, AD, Intunes & Entra Admin. SQL database, DORA',
   },
   {
     id: 'frontend',
-    period: '2022 — 2024',
-    role: 'Frontend Developer',
-    description: 'Thoughtful web apps and creative campaigns.',
+    period: '2024 — June',
+    role: 'Versatile Sales Advisor',
+    description: 'Customer advisory and operational organization in retail environment',
   },
   {
     id: 'design',
-    period: '2020 — 2022',
-    role: 'Digital Design Intern',
-    description: 'Exploring UI/UX, motion and creative coding.',
+    period: '2023 — June',
+    role: 'IT and Network Maintenance Technician',
+    description: 'Presentive and corrrective maintenance of IT equipment',
   },
 ]
