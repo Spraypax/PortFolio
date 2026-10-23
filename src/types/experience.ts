@@ -1,3 +1,5 @@
+import type { LucideIcon } from 'lucide-react'
+
 export interface Experience {
   id: string
   period: string
@@ -8,4 +10,5 @@ export interface Experience {
 export interface ExperienceCategory {
   id: string
   title: string
+  icon: LucideIcon
 }

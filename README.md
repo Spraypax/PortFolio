@@ -144,7 +144,7 @@ Chaque `SkillCategory` possède son propre état d'ouverture et affiche ses comp
 
 La chronologie compacte conserve sa présentation, ses dimensions et ses données actuelles. Toute la carte ouvre un grand panneau via le même composant `ExpandablePanel` que Skills : animation depuis la carte, croix de fermeture, Échap, verrouillage du défilement de fond et retour du focus.
 
-Les catégories **Professional Experience** et **Academic Path**, définies dans `src/data/experience.ts`, sont visibles uniquement dans le grand panneau et deviennent interactives après la fin de l'agrandissement. Elles utilisent `AccordionItem`, comme Skills, avec des chevrons animés et des ouvertures indépendantes. Leurs contenus restent volontairement vides. Chaque réouverture du panneau remet les deux catégories à l'état fermé.
+Les catégories **Professional Experience** et **Academic Path**, définies dans `src/data/experience.ts`, sont visibles uniquement dans le grand panneau et deviennent interactives après la fin de l'agrandissement. Elles utilisent `AccordionItem`, comme Skills, avec des chevrons animés et des ouvertures indépendantes. Une mallette et une toque universitaire Lucide monochromes accompagnent leurs titres, uniquement dans cette version agrandie. Leurs contenus restent volontairement vides. Chaque réouverture du panneau remet les deux catégories à l'état fermé.
 
 ## Future intégration PSP 2.5D
 

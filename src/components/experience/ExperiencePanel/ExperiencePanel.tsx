@@ -43,6 +43,7 @@ export function ExperiencePanel() {
             key={category.id}
             id={`experience-${category.id}`}
             title={category.title}
+            icon={category.icon}
             expanded={expandedCategories.has(category.id)}
             disabled={!interactive}
             onToggle={() => toggleCategory(category.id)}

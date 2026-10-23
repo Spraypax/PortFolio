@@ -1,3 +1,4 @@
+import { Briefcase, GraduationCap } from 'lucide-react'
 import type { Experience, ExperienceCategory } from '../types/experience'
 
 // Experience details provided by the portfolio owner.
@@ -24,6 +25,6 @@ export const experience: Experience[] = [
 
 // Expanded sections are intentionally empty until their content is provided.
 export const experienceCategories: ExperienceCategory[] = [
-  { id: 'professional', title: 'Professional Experience' },
-  { id: 'academic', title: 'Academic Path' },
+  { id: 'professional', title: 'Professional Experience', icon: Briefcase },
+  { id: 'academic', title: 'Academic Path', icon: GraduationCap },
 ]
