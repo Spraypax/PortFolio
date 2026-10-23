@@ -53,14 +53,14 @@ src/
 │   ├── psp/                   # PspStage vide uniquement
 │   ├── music/                 # Aperçu visuel du lecteur, sans lecture audio
 │   ├── projects/              # FeaturedProjects, ProjectCard
-│   ├── skills/                # SkillsPanel, SkillBar
+│   ├── skills/                # SkillsPanel et accordéons SkillCategory
 │   ├── memory/                # MemoryCardPanel
 │   ├── experience/            # ExperiencePanel
 │   └── contact/               # ContactPanel
 ├── data/                      # Profil et contenus de démonstration
-├── hooks/                     # Horloge et détection d'entrée dans le viewport
+├── hooks/                     # Horloge et panneau agrandissable
 ├── styles/                    # Reset, variables, typographie et styles globaux
-├── types/                     # Project, Skill, Experience
+├── types/                     # Project, SkillCategory, Experience
 ├── App.tsx                    # Composition de la page uniquement
 ├── App.module.css             # Grilles principales et réorganisation responsive
 └── main.tsx
@@ -75,7 +75,7 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 | `src/data/profile.ts`     | Nom, rôle, localisation, CV, introduction et tags             |
 | `src/data/navigation.ts`  | Liens et libellés de navigation                               |
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
-| `src/data/skills.ts`      | Compétences, icônes, valeurs et couleurs                      |
+| `src/data/skills.ts`      | Identifiants et titres des six catégories de compétences      |
 | `src/data/experience.ts`  | Périodes, postes et descriptions                              |
 | `src/data/memory.ts`      | Nom de sauvegarde, date et compteurs                          |
 | `src/data/socialLinks.ts` | Texte de contact, adresse email et réseaux sociaux            |
@@ -126,10 +126,19 @@ L'accessibilité comprend :
 - Lien d'évitement vers le contenu et focus visible.
 - Navigation mobile au clavier, fermeture avec Échap et retour du focus.
 - Textes alternatifs pour les images utiles, images décoratives ignorées.
-- Indicateurs natifs de progression avec libellés accessibles.
-- Prise en compte de `prefers-reduced-motion` pour les transitions, les jauges et le défilement.
+- Panneau Skills modal natif, focus contenu dans le panneau, fermeture par Échap et retour du focus au déclencheur.
+- Accordéons indépendants avec `aria-expanded`, désactivés jusqu'à la fin de l'agrandissement.
+- Prise en compte de `prefers-reduced-motion` pour les animations, les transitions et le défilement.
 
 L'horloge affiche la date, l'année et l'heure en **anglais**, selon le fuseau horaire du navigateur. Elle se met à jour toutes les 15 secondes et ne demande aucune permission. L'icône de batterie est décorative.
+
+## Panneau Skills
+
+Le format compact affiche uniquement les six catégories et leurs chevrons, sans menus interactifs. Toute la carte est un bouton d'agrandissement accessible au clavier. Elle conserve sa place dans la grille pendant qu'un `<dialog>` modal s'agrandit depuis sa position vers le centre de l'écran.
+
+`useExpandingDialog` gère les phases fermé, ouverture, ouvert et fermeture avec la Web Animations API. Les catégories ne deviennent utilisables qu'après la fin effective de l'animation. La croix et Échap ferment le panneau avec une animation inverse ; la page retrouve son défilement et le focus revient au bouton Skills. Les animations respectent la préférence de réduction des mouvements.
+
+Chaque `SkillCategory` possède son propre état d'ouverture. Les zones de contenu restent volontairement vides, avec un espace réservé pour la future intégration. Plusieurs catégories peuvent être ouvertes simultanément et elles sont toutes refermées lors d'une nouvelle ouverture du panneau. Sur les petits écrans, le panneau occupe presque toute la fenêtre et les catégories défilent sous son en-tête.
 
 ## Future intégration PSP 2.5D
 
@@ -150,3 +159,5 @@ La navbar est transparente, sans flou ni aplat de couleur, et laisse apparaître
 ## Vérification
 
 Le build exécute TypeScript avant Vite. Vérifier également `npm run lint`, `npm run format:check`, les six ancres, la navigation mobile au clavier, l'absence de défilement horizontal aux principaux breakpoints, le cadre photo vide et l'absence de contenu dans `PspStage`.
+
+Pour Skills : vérifier l'absence des anciennes jauges, le mode compact non déroulable, le verrouillage pendant l'agrandissement, l'ouverture simultanée de plusieurs catégories, la fermeture par croix et Échap, le retour du focus et le défilement du panneau sur mobile.

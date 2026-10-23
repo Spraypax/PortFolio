@@ -1,8 +1,4 @@
-import type { LucideIcon } from 'lucide-react'
-
-export interface Skill {
-  name: string
-  value: number
-  icon: LucideIcon
-  tone: 'blue' | 'purple'
+export interface SkillCategory {
+  id: string
+  title: string
 }
