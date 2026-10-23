@@ -10,6 +10,7 @@ interface SkillCategoryProps {
 }
 
 export function SkillCategory({ category, expanded, disabled, onToggle }: SkillCategoryProps) {
+  const Icon = category.icon
   const buttonId = `skill-${category.id}-toggle`
   const contentId = `skill-${category.id}-content`
 
@@ -25,8 +26,11 @@ export function SkillCategory({ category, expanded, disabled, onToggle }: SkillC
           aria-controls={contentId}
           onClick={onToggle}
         >
-          <span>{category.title}</span>
-          <ChevronDown size={18} strokeWidth={1.6} aria-hidden="true" />
+          <span className={styles.label}>
+            <Icon className={styles.categoryIcon} size={20} strokeWidth={1.6} aria-hidden="true" />
+            <span>{category.title}</span>
+          </span>
+          <ChevronDown className={styles.chevron} size={18} strokeWidth={1.6} aria-hidden="true" />
         </button>
       </h3>
       <div
@@ -38,8 +42,15 @@ export function SkillCategory({ category, expanded, disabled, onToggle }: SkillC
         className={styles.content}
       >
         <div className={styles.contentClip}>
-          {/* Reserved for future category content; intentionally empty for now. */}
-          <div className={styles.contentBody} />
+          <div className={styles.contentBody}>
+            <ul className={styles.skills}>
+              {category.skills.map((skill) => (
+                <li key={skill} className={styles.skill}>
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </li>

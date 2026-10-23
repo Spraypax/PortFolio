@@ -75,7 +75,7 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 | `src/data/profile.ts`     | Nom, rôle, localisation, CV, introduction et tags             |
 | `src/data/navigation.ts`  | Liens et libellés de navigation                               |
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
-| `src/data/skills.ts`      | Identifiants et titres des six catégories de compétences      |
+| `src/data/skills.ts`      | Titres, icônes et compétences des six catégories              |
 | `src/data/experience.ts`  | Périodes, postes et descriptions                              |
 | `src/data/memory.ts`      | Nom de sauvegarde, date et compteurs                          |
 | `src/data/socialLinks.ts` | Texte de contact, adresse email et réseaux sociaux            |
@@ -138,7 +138,7 @@ Le format compact affiche uniquement les six catégories et leurs chevrons, sans
 
 `useExpandingDialog` gère les phases fermé, ouverture, ouvert et fermeture avec la Web Animations API. Les catégories ne deviennent utilisables qu'après la fin effective de l'animation. La croix et Échap ferment le panneau avec une animation inverse ; la page retrouve son défilement et le focus revient au bouton Skills. Les animations respectent la préférence de réduction des mouvements.
 
-Chaque `SkillCategory` possède son propre état d'ouverture. Les zones de contenu restent volontairement vides, avec un espace réservé pour la future intégration. Plusieurs catégories peuvent être ouvertes simultanément et elles sont toutes refermées lors d'une nouvelle ouverture du panneau. Sur les petits écrans, le panneau occupe presque toute la fenêtre et les catégories défilent sous son en-tête.
+Chaque `SkillCategory` possède son propre état d'ouverture et affiche ses compétences sous forme de tags discrets. Les six icônes Lucide monochromes sont visibles uniquement dans le grand panneau ; le format compact conserve seulement les titres et les chevrons. Les titres, les icônes et les listes de compétences sont centralisés dans `src/data/skills.ts`. Plusieurs catégories peuvent être ouvertes simultanément et elles sont toutes refermées lors d'une nouvelle ouverture du panneau. Sur les petits écrans, le panneau occupe presque toute la fenêtre et les catégories défilent sous son en-tête.
 
 ## Future intégration PSP 2.5D
 
