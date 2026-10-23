@@ -19,19 +19,73 @@
   line-height: 1.6;
 }
 .actions {
+  container-type: inline-size;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px 15px;
+  gap: clamp(6px, 2%, 15px);
   margin-top: 16px;
 }
+
+.messageAction {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.messageButton {
+  white-space: nowrap;
+}
+
 .socials {
   display: flex;
+  align-items: center;
+  flex-shrink: 0;
   gap: 2px;
 }
-.placeholder {
-  margin-top: 7px;
-  color: var(--color-text-muted);
-  font: 0.56rem var(--font-display);
-  letter-spacing: 0.04em;
+
+@container (max-width: 300px) {
+  .messageButton {
+    gap: 6px;
+    padding-inline: 8px;
+    font-size: 0.72rem;
+  }
+
+  .socials {
+    gap: 0;
+  }
+
+  .socials a {
+    width: 38px;
+  }
+}
+
+.toast {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  padding: 9px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-800);
+  color: var(--color-blue-300);
+  box-shadow: var(--shadow-panel), var(--glow-blue);
+  font-size: 0.65rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    visibility var(--transition-fast);
+}
+
+.toastVisible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }

@@ -82,7 +82,9 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 
 Les projets portent un label **Demo** via `isPlaceholder`. Retirer ce drapeau lors de l'ajout de vrais projets. Les liens `url` et `githubUrl` sont facultatifs : aucun lien de démonstration ne pointe vers une destination arbitraire.
 
-Pour activer le contact, renseigner `contact.email` et les propriétés `url` des réseaux sociaux. En leur absence, les boutons sont désactivés et un message visible indique que les contacts sont des placeholders. Le bouton email ouvre le logiciel de messagerie ; aucun service d'envoi ni formulaire serveur n'est prévu dans cette phase.
+Les liens GitHub, LinkedIn et Root-Me ouvrent les profils dans un nouvel onglet et restent alignés à droite du bouton « Send a message ». Ce bouton ouvre le logiciel de messagerie avec `contact.email` comme destinataire, copie également l'adresse et affiche une confirmation pendant trois secondes. Si la copie n'est pas disponible, le lien email reste utilisable sans message d'erreur. Aucun service d'envoi ni formulaire serveur n'est prévu dans cette phase.
+
+Le pictogramme Root-Me provient de [Simple Icons](https://github.com/simple-icons/simple-icons/blob/develop/icons/rootme.svg), distribué sous [CC0](https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md), et reprend la couleur des autres icônes sociales.
 
 ## Custom assets
 

@@ -2,18 +2,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 42px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-blue-300);
-  transition: background var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    filter var(--transition-fast);
 }
 
-a.button:hover {
+a.button {
+  cursor: pointer;
+}
+
+a.button:hover,
+a.button:focus-visible {
   background: rgb(90 155 255 / 18%);
+  color: var(--color-text-primary);
+  filter: drop-shadow(0 0 6px rgb(100 173 255 / 25%));
 }
 
 .button:disabled {
