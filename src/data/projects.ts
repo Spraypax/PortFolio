@@ -1,7 +1,7 @@
 import honeypot from '../assets/images/projects/honeypot.png'
 import vulnerabilityScanner from '../assets/images/projects/vulnerability-scanner.png'
 import rat from '../assets/images/projects/rat.png'
-import orbit from '../assets/images/projects/orbit.svg'
+import portfolio from '../assets/images/projects/portfolio.png'
 import type { Project } from '../types/project'
 
 // Sample projects and original placeholder illustrations; no fabricated external links.
@@ -43,13 +43,14 @@ export const projects: Project[] = [
     isPlaceholder: true,
   },
   {
-    id: 'orbit',
-    title: 'Orbit',
-    description: 'A digital journey through space and solitude.',
-    image: orbit,
-    imageAlt: 'A blue planet and orbital rings against a field of stars',
-    tags: ['Web Art', 'Creative Dev'],
+    id: 'portfolio',
+    title: 'Port Folio',
+    description: 'Site personnel interactif au style PlayStation',
+    image: portfolio,
+    imageAlt: 'A black PSP console with luminous blue waves on its screen',
+    tags: ['TypeScript', 'Frontend'],
     category: 'Experiment',
+    cardUrl: 'https://github.com/Spraypax/PortFolio',
     showPlaystationBadge: true,
     isPlaceholder: true,
   },

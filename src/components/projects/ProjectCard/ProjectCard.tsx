@@ -14,13 +14,18 @@ export function ProjectCard({
 }) {
   const centerArtwork =
     showPlaystationBadge && ['honeypot', 'vulnerability-scanner', 'rat'].includes(project.id)
+  const insetArtwork = showPlaystationBadge && project.id === 'portfolio'
 
   const content = (
     <>
       <div className={styles.cover}>
         {project.image && (
           <img
-            className={`${styles.artwork} ${centerArtwork ? styles.centeredArtwork : ''}`}
+            className={[
+              styles.artwork,
+              centerArtwork ? styles.centeredArtwork : '',
+              insetArtwork ? styles.insetArtwork : '',
+            ].join(' ')}
             src={project.image}
             alt={project.imageAlt}
             width={400}
