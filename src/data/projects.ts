@@ -1,5 +1,5 @@
 import honeypot from '../assets/images/projects/honeypot.png'
-import garden from '../assets/images/projects/pixel-garden.svg'
+import vulnerabilityScanner from '../assets/images/projects/vulnerability-scanner.png'
 import rat from '../assets/images/projects/rat.png'
 import orbit from '../assets/images/projects/orbit.svg'
 import type { Project } from '../types/project'
@@ -19,13 +19,14 @@ export const projects: Project[] = [
     isPlaceholder: true,
   },
   {
-    id: 'pixel-garden',
-    title: 'Pixel Garden',
-    description: 'A creative playground for pixel art and web tech.',
-    image: garden,
-    imageAlt: 'An isometric floating garden with luminous green trees',
-    tags: ['Web App', 'Creative Code'],
+    id: 'vulnerability-scanner',
+    title: 'Vulnerability Scanner',
+    description: 'Analyse de sécurité web, détection et reporting',
+    image: vulnerabilityScanner,
+    imageAlt: 'Web security dashboard with connected nodes, a shield and a radar',
+    tags: ['Go', 'Frontend'],
     category: 'Experiment',
+    cardUrl: 'https://github.com/Spraypax/Vulnerability-Scanner',
     showPlaystationBadge: true,
     isPlaceholder: true,
   },

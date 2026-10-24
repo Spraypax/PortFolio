@@ -12,7 +12,8 @@ export function ProjectCard({
   project: Project
   showPlaystationBadge?: boolean
 }) {
-  const centerArtwork = showPlaystationBadge && (project.id === 'honeypot' || project.id === 'rat')
+  const centerArtwork =
+    showPlaystationBadge && ['honeypot', 'vulnerability-scanner', 'rat'].includes(project.id)
 
   const content = (
     <>
