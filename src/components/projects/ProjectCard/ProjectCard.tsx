@@ -12,12 +12,14 @@ export function ProjectCard({
   project: Project
   showPlaystationBadge?: boolean
 }) {
+  const centerArtwork = showPlaystationBadge && (project.id === 'honeypot' || project.id === 'rat')
+
   const content = (
     <>
       <div className={styles.cover}>
         {project.image && (
           <img
-            className={`${styles.artwork} ${project.id === 'honeypot' && showPlaystationBadge ? styles.centeredArtwork : ''}`}
+            className={`${styles.artwork} ${centerArtwork ? styles.centeredArtwork : ''}`}
             src={project.image}
             alt={project.imageAlt}
             width={400}

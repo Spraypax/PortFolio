@@ -1,6 +1,6 @@
 import honeypot from '../assets/images/projects/honeypot.png'
 import garden from '../assets/images/projects/pixel-garden.svg'
-import echoes from '../assets/images/projects/echoes.svg'
+import rat from '../assets/images/projects/rat.png'
 import orbit from '../assets/images/projects/orbit.svg'
 import type { Project } from '../types/project'
 
@@ -30,13 +30,14 @@ export const projects: Project[] = [
     isPlaceholder: true,
   },
   {
-    id: 'echoes',
-    title: 'Echoes',
-    description: 'An immersive exploration of memory and sound.',
-    image: echoes,
-    imageAlt: 'A violet illuminated doorway in a dark futuristic room',
-    tags: ['Interactive', 'Audio Visual'],
+    id: 'rat',
+    title: 'RAT',
+    description: 'Contrôle distant sécurisé et multi-agents',
+    image: rat,
+    imageAlt: 'A computer monitor and remote control connected through a secure wireless link',
+    tags: ['Python', 'Docker'],
     category: 'Experience',
+    cardUrl: 'https://github.com/DylanK77/Projet_RAT',
     showPlaystationBadge: true,
     isPlaceholder: true,
   },
