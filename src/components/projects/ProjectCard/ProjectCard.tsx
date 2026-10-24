@@ -12,8 +12,8 @@ export function ProjectCard({
   project: Project
   showPlaystationBadge?: boolean
 }) {
-  return (
-    <article className={styles.card}>
+  const content = (
+    <>
       <div className={styles.cover}>
         {project.image && (
           <img
@@ -39,7 +39,7 @@ export function ProjectCard({
           <Tag key={tag}>{tag}</Tag>
         ))}
       </div>
-      {(project.url || project.githubUrl) && (
+      {!project.cardUrl && (project.url || project.githubUrl) && (
         <div className={styles.links}>
           {project.url && (
             <a href={project.url} target="_blank" rel="noreferrer">
@@ -57,6 +57,24 @@ export function ProjectCard({
             </a>
           )}
         </div>
+      )}
+    </>
+  )
+
+  return (
+    <article className={styles.card}>
+      {project.cardUrl ? (
+        <a
+          className={styles.cardLink}
+          href={project.cardUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${project.title} — open project in a new tab`}
+        >
+          {content}
+        </a>
+      ) : (
+        content
       )}
     </article>
   )

@@ -6,6 +6,7 @@ export interface Project {
   imageAlt: string
   tags: string[]
   category: string
+  cardUrl?: string
   url?: string
   githubUrl?: string
   showPlaystationBadge?: boolean

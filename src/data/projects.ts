@@ -9,11 +9,12 @@ export const projects: Project[] = [
   {
     id: 'honeypot',
     title: 'Honeypot',
-    description: 'A dreamy portfolio theme inspired by city pop.',
+    description: 'Honeypots Go multi-services, logs et dashboard',
     image: honeypot,
     imageAlt: 'Golden honey flowing from a wooden dipper into a glass jar',
     tags: ['Go', 'Frontend'],
     category: 'Website',
+    cardUrl: 'https://github.com/DylanK77/TRAPNET-GO',
     showPlaystationBadge: true,
     isPlaceholder: true,
   },
