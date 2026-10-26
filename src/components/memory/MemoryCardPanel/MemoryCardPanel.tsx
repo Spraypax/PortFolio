@@ -1,21 +1,15 @@
-import { Folder } from 'lucide-react'
 import image from '../../../assets/images/playstation/memory-card.png'
-import { memory } from '../../../data/memory'
+import { getYearsOfExperience, memory } from '../../../data/memory'
+import { useGithubRepositoryCount } from '../../../hooks/useGithubRepositoryCount'
 import { Panel } from '../../ui/Panel/Panel'
 import styles from './MemoryCardPanel.module.css'
 
 export function MemoryCardPanel({ className = '' }: { className?: string }) {
-  const savedAt = new Date(memory.savedAt)
-  const savedDate = savedAt.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-  })
-  const savedTime = savedAt.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  })
+  const savedAt = __PORTFOLIO_BUILD_DATE__ ?? memory.savedAt
+  const savedDate = savedAt.split('-').reverse().join('/')
+  const projectsCompleted = useGithubRepositoryCount(memory.githubUsername, memory.projectsFallback)
+  const yearsOfExperience = getYearsOfExperience()
+
   return (
     <Panel title="Memory card" detail="››" className={`${styles.panel} ${className}`}>
       <div className={styles.content}>
@@ -29,19 +23,26 @@ export function MemoryCardPanel({ className = '' }: { className?: string }) {
         />
         <div className={styles.data}>
           <h3>{memory.title}</h3>
-          <p>Saved data</p>
-          <time dateTime={memory.savedAt}>
-            {savedDate} · {savedTime}
-          </time>
-          <ul>
-            {memory.folders.map((folder) => (
-              <li key={folder.name}>
-                <Folder size={15} aria-hidden="true" />
-                <span>{folder.name}</span>
-                <span className={styles.count}>{folder.count} files</span>
-              </li>
-            ))}
-          </ul>
+          <dl className={styles.stats}>
+            <div>
+              <dt>Last Save</dt>
+              <dd>
+                <time dateTime={savedAt}>{savedDate}</time>
+              </dd>
+            </div>
+            <div>
+              <dt>Projects Completed</dt>
+              <dd>{projectsCompleted}</dd>
+            </div>
+            <div>
+              <dt>Years of XP</dt>
+              <dd>{yearsOfExperience}</dd>
+            </div>
+            <div>
+              <dt>Current Quest</dt>
+              <dd>{memory.currentQuest}</dd>
+            </div>
+          </dl>
         </div>
       </div>
     </Panel>

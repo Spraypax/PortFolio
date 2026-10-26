@@ -17,6 +17,7 @@ Ouvrir l'adresse locale affichée par Vite, normalement **http://127.0.0.1:5173/
 
 ```sh
 npm run build        # Vérification TypeScript et génération de dist/
+npm test             # Dates de sauvegarde, XP et compteur GitHub (avec réponses simulées)
 npm run preview      # Aperçu du build de production
 npm run lint         # ESLint
 npm run format:check # Vérification du formatage
@@ -77,10 +78,14 @@ Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionT
 | `src/data/projects.ts`    | Projets, images, descriptions, tags, catégorie, URL et GitHub |
 | `src/data/skills.ts`      | Titres, icônes et compétences des six catégories              |
 | `src/data/experience.ts`  | Chronologie compacte, catégories et parcours détaillés        |
-| `src/data/memory.ts`      | Nom de sauvegarde, date et compteurs                          |
+| `src/data/memory.ts`      | Fiche de sauvegarde, GitHub, expérience et quête actuelle     |
 | `src/data/socialLinks.ts` | Texte de contact, adresse email et réseaux sociaux            |
 
 Les projets portent un label **Demo** via `isPlaceholder`. Retirer ce drapeau lors de l'ajout de vrais projets. Les liens `url` et `githubUrl` sont facultatifs : aucun lien de démonstration ne pointe vers une destination arbitraire.
+
+La **Memory Card** présente le profil sous forme de sauvegarde. En développement, `Last Save` utilise la date fixe `2026-10-26` de `src/data/memory.ts`. En production, Vite inscrit la date de génération du build (fuseau Europe/Paris) dans le bundle : elle change lors d'un nouveau build/déploiement, jamais à chaque visite. `Years of XP` utilise l'année du visiteur avec la référence 2026 = 2 ans. `Current Quest` reste modifiable dans les données.
+
+`Projects Completed` lit le champ `public_repos` de l'[API publique GitHub](https://docs.github.com/en/rest/users/users#get-a-user) pour Spraypax, sans jeton ni authentification. Le résultat valide est conservé une heure en cache local ; une visite après expiration déclenche une nouvelle récupération. Le compteur affiche 13 par défaut, notamment hors ligne, si GitHub limite les requêtes, si la réponse est invalide ou si la récupération dépasse huit secondes. Le bloc reste utilisable quand le stockage local est désactivé.
 
 Les liens GitHub, LinkedIn et Root-Me ouvrent les profils dans un nouvel onglet et restent alignés à droite du bouton « Send a message ». Ce bouton ouvre le logiciel de messagerie avec `contact.email` comme destinataire, copie également l'adresse et affiche une confirmation pendant trois secondes. Si la copie n'est pas disponible, le lien email reste utilisable sans message d'erreur. Aucun service d'envoi ni formulaire serveur n'est prévu dans cette phase.
 

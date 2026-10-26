@@ -1,10 +1,13 @@
 export const memory = {
   title: 'Portfolio v1.0',
-  savedAt: '2025-04-28T22:24:00',
-  folders: [
-    { name: 'Projects', count: 4 },
-    { name: 'Designs', count: 8 },
-    { name: 'Ideas', count: 24 },
-    { name: 'Screenshots', count: 36 },
-  ],
+  savedAt: '2026-10-26',
+  githubUsername: 'Spraypax',
+  projectsFallback: 13,
+  experienceBaseYear: 2026,
+  experienceBaseYears: 2,
+  currentQuest: 'M2 Cybersecurity',
+}
+
+export function getYearsOfExperience(year = new Date().getFullYear()) {
+  return Math.max(0, memory.experienceBaseYears + year - memory.experienceBaseYear)
 }
