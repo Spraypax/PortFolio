@@ -9,7 +9,7 @@ export const projects: Project[] = [
   {
     id: 'honeypot',
     title: 'Honeypot',
-    description: 'Honeypots Go multi-services, logs et dashboard',
+    description: 'Multi-service Go honeypots, logs and dashboard',
     image: honeypot,
     imageAlt: 'Golden honey flowing from a wooden dipper into a glass jar',
     tags: ['Go', 'Frontend'],
@@ -21,7 +21,7 @@ export const projects: Project[] = [
   {
     id: 'vulnerability-scanner',
     title: 'Vulnerability Scanner',
-    description: 'Analyse de sécurité web, détection et reporting',
+    description: 'Web security analysis, detection and reporting',
     image: vulnerabilityScanner,
     imageAlt: 'Web security dashboard with connected nodes, a shield and a radar',
     tags: ['Go', 'Frontend'],
@@ -33,7 +33,7 @@ export const projects: Project[] = [
   {
     id: 'rat',
     title: 'RAT',
-    description: 'Contrôle distant sécurisé et multi-agents',
+    description: 'Secure remote control with multiple agents',
     image: rat,
     imageAlt: 'A computer monitor and remote control connected through a secure wireless link',
     tags: ['Python', 'Docker'],
@@ -45,7 +45,7 @@ export const projects: Project[] = [
   {
     id: 'portfolio',
     title: 'Port Folio',
-    description: 'Site personnel interactif au style PlayStation',
+    description: 'Interactive personal website inspired by PlayStation',
     image: portfolio,
     imageAlt: 'A black PSP console with luminous blue waves on its screen',
     tags: ['TypeScript', 'Frontend'],
