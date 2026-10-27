@@ -1,12 +1,25 @@
+import type { MouseEventHandler } from 'react'
 import { MapPin } from 'lucide-react'
 import { profile } from '../../../data/profile'
 import { Panel } from '../../ui/Panel/Panel'
 import { Tag } from '../../ui/Tag/Tag'
+import expandableStyles from '../../ui/ExpandablePanel/ExpandablePanel.module.css'
 import styles from './ProfileCard.module.css'
 
-export function ProfileCard() {
+export function ProfileCard({
+  onAboutOpen,
+  aboutExpanded,
+}: {
+  onAboutOpen: MouseEventHandler<HTMLButtonElement>
+  aboutExpanded: boolean
+}) {
   return (
-    <Panel id="about" title="Player 01" detail="1P" className={styles.card}>
+    <Panel
+      id="about"
+      title="Player 01"
+      detail="1P"
+      className={`${styles.card} ${expandableStyles.compact}`}
+    >
       <div className={styles.content}>
         {/* Intentionally empty: the user's avatar will only be added on request. */}
         <div className={styles.photo} aria-hidden="true" data-profile-photo />
@@ -25,6 +38,15 @@ export function ProfileCard() {
           <Tag key={tag}>{tag}</Tag>
         ))}
       </div>
+      <button
+        type="button"
+        className={expandableStyles.expandButton}
+        aria-label="Expand About me — Player 01"
+        aria-haspopup="dialog"
+        aria-controls="about-dialog"
+        aria-expanded={aboutExpanded}
+        onClick={onAboutOpen}
+      />
     </Panel>
   )
 }

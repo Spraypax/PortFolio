@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
-import { X } from 'lucide-react'
 import { useExpandingDialog } from '../../../hooks/useExpandingDialog'
 import { Panel } from '../Panel/Panel'
-import { SectionTitle } from '../SectionTitle/SectionTitle'
+import { ExpandingDialog } from '../ExpandingDialog/ExpandingDialog'
 import styles from './ExpandablePanel.module.css'
 
 interface ExpandablePanelProps {
@@ -24,7 +23,8 @@ export function ExpandablePanel({
   onOpen,
   children,
 }: ExpandablePanelProps) {
-  const { triggerRef, dialogRef, phase, open, close, handleKeyDown } = useExpandingDialog()
+  const controller = useExpandingDialog()
+  const { triggerRef, phase, open } = controller
   const dialogId = `${id}-dialog`
 
   return (
@@ -45,35 +45,11 @@ export function ExpandablePanel({
           }}
         />
       </Panel>
-      <dialog
-        ref={dialogRef}
-        id={dialogId}
-        className={styles.dialog}
-        data-phase={phase}
-        aria-labelledby={`${dialogId}-heading`}
-        aria-modal="true"
-        onKeyDown={handleKeyDown}
-        onCancel={(event) => {
-          event.preventDefault()
-          void close()
-        }}
-      >
-        <div className={styles.dialogHeader}>
-          <SectionTitle id={`${dialogId}-heading`}>{title}</SectionTitle>
-          <button
-            type="button"
-            className={styles.closeButton}
-            aria-label={`Close ${title}`}
-            onClick={() => void close()}
-            autoFocus
-          >
-            <X size={19} strokeWidth={1.6} aria-hidden="true" />
-          </button>
-        </div>
+      <ExpandingDialog id={dialogId} title={title} controller={controller}>
         <ul className={styles.categories} aria-busy={phase === 'opening'}>
           {children(phase === 'open')}
         </ul>
-      </dialog>
+      </ExpandingDialog>
     </>
   )
 }

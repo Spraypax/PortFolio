@@ -41,6 +41,10 @@
   gap: 10px;
 }
 
+.aboutButton {
+  cursor: pointer;
+}
+
 @media (max-width: 767px) {
   .intro {
     padding: 25px 0 15px;

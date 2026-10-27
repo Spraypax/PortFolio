@@ -4,6 +4,7 @@ type DialogPhase = 'closed' | 'opening' | 'open' | 'closing'
 
 export function useExpandingDialog() {
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const activeTriggerRef = useRef<HTMLButtonElement | null>(null)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const animationRef = useRef<Animation | null>(null)
   const restoreScrollRef = useRef<(() => void) | null>(null)
@@ -16,7 +17,7 @@ export function useExpandingDialog() {
   }
 
   function compactTransform(dialog: HTMLDialogElement) {
-    const source = triggerRef.current!.getBoundingClientRect()
+    const source = activeTriggerRef.current!.getBoundingClientRect()
     const target = dialog.getBoundingClientRect()
     return `translate(${source.left - target.left}px, ${source.top - target.top}px) scale(${source.width / target.width}, ${source.height / target.height})`
   }
@@ -39,10 +40,11 @@ export function useExpandingDialog() {
     }
   }
 
-  async function open() {
+  async function open(source = triggerRef.current) {
     const dialog = dialogRef.current
-    if (!dialog || !triggerRef.current || phaseRef.current !== 'closed') return
+    if (!dialog || !source || phaseRef.current !== 'closed') return
 
+    activeTriggerRef.current = source
     changePhase('opening')
     const root = document.documentElement
     const previousOverflow = root.style.overflow
@@ -72,7 +74,7 @@ export function useExpandingDialog() {
       restoreScrollRef.current?.()
       restoreScrollRef.current = null
       changePhase('closed')
-      triggerRef.current?.focus({ preventScroll: true })
+      activeTriggerRef.current?.focus({ preventScroll: true })
     }
   }
 

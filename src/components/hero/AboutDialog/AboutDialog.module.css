@@ -1,0 +1,27 @@
+.reading {
+  flex: 1;
+  min-height: 0;
+  padding: 3px 12px 3px 3px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #486a9d transparent;
+  color: var(--color-text-secondary);
+  font-size: clamp(0.9375rem, 0.85rem + 0.2vw, 1rem);
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+.reading:focus-visible {
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+
+.prose {
+  max-width: 74ch;
+  margin-inline: auto;
+}
+
+.prose p + p {
+  margin-top: 1.25em;
+}

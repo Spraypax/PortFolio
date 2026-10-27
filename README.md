@@ -67,7 +67,7 @@ src/
 └── main.tsx
 ```
 
-Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionTitle` et `IconButton` constituent le petit design system réutilisable. `ExpandablePanel` et `AccordionItem` partagent la structure et les styles d'agrandissement et d'accordéon entre Skills et Experience. Les composants ne contiennent pas de copies des listes de données.
+Les styles vivent auprès de leur composant. `Panel`, `Button`, `Tag`, `SectionTitle` et `IconButton` constituent le petit design system réutilisable. `ExpandingDialog` et `useExpandingDialog` partagent le panneau modal, les styles, les animations et la gestion du focus entre About Me, Skills et Experience. `ExpandablePanel` et `AccordionItem` conservent les aperçus et accordéons de Skills et Experience. Les composants ne contiennent pas de copies des listes de données.
 
 ## Modifier le contenu
 
@@ -133,11 +133,17 @@ L'accessibilité comprend :
 - Lien d'évitement vers le contenu et focus visible.
 - Navigation mobile au clavier, fermeture avec Échap et retour du focus.
 - Textes alternatifs pour les images utiles, images décoratives ignorées.
-- Panneaux Skills et Experience modaux natifs, focus contenu dans le panneau, fermeture par Échap et retour du focus au déclencheur.
+- Panneaux About Me, Skills et Experience modaux natifs, focus contenu dans le panneau, fermeture par Échap et retour du focus au déclencheur.
 - Accordéons indépendants avec `aria-expanded`, désactivés jusqu'à la fin de l'agrandissement.
 - Prise en compte de `prefers-reduced-motion` pour les animations, les transitions et le défilement.
 
 L'horloge affiche la date, l'année et l'heure en **anglais**, selon le fuseau horaire du navigateur. Elle se met à jour toutes les 15 secondes et ne demande aucune permission. L'icône de batterie est décorative.
+
+## Panneau About Me
+
+Le bouton **About me** et toute la carte **Player 01** ouvrent une seule instance de `AboutDialog`, contrôlée depuis `Hero`. Les deux déclencheurs partagent `aria-controls` et l'état d'ouverture. L'animation part du déclencheur utilisé ; la croix et Échap referment le panneau vers ce même déclencheur et lui rendent le focus. Les tentatives d'ouverture pendant une ouverture, une fermeture ou lorsque le panneau est déjà ouvert sont ignorées.
+
+Les dix paragraphes fournis sont centralisés, sans reformulation, dans `src/data/about.ts`. Le texte conserve une largeur de lecture limitée, des paragraphes espacés et un défilement interne accessible au clavier si nécessaire. L'en-tête et la croix restent visibles pendant la lecture. Le style, les animations de 440 ms et 300 ms, la réduction des mouvements et le responsive proviennent du même système que Skills et Experience. Le lien **About** de la navbar conserve son ancre et son glow temporaire sur Player 01.
 
 ## Panneau Skills
 
