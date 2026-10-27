@@ -8,6 +8,18 @@
   background: linear-gradient(130deg, rgb(100 137 209 / 12%), transparent 55%), var(--color-panel);
   box-shadow: var(--shadow-panel);
   backdrop-filter: blur(15px);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.panel:global(.nav-highlight),
+.panel:global(.nav-highlight):hover {
+  border-color: var(--color-blue-300);
+  box-shadow:
+    var(--shadow-panel-hover),
+    0 0 24px rgb(58 141 255 / 16%),
+    inset 0 0 10px rgb(115 180 255 / 7%);
 }
 
 .panel::after {
