@@ -14,7 +14,7 @@
   max-width: none;
   height: auto;
   margin-left: -12%;
-  transform: translateY(3%) scale(1.28);
+  transform: scale(1.28);
   filter: drop-shadow(0 8px 12px rgb(64 104 215 / 25%));
 }
 
@@ -164,9 +164,7 @@
 
 @media (min-width: 1024px) {
   .memory {
-    align-self: start;
-    transform: translateY(-16px) scale(1.4);
-    transform-origin: center top;
+    transform: scale(1.4);
   }
 
   .data {
