@@ -21,8 +21,16 @@ export function ProfileCard({
       className={`${styles.card} ${expandableStyles.compact}`}
     >
       <div className={styles.content}>
-        {/* Intentionally empty: the user's avatar will only be added on request. */}
-        <div className={styles.photo} aria-hidden="true" data-profile-photo />
+        <div className={styles.photo} data-profile-photo>
+          <img
+            className={styles.portrait}
+            src={profile.avatar.url}
+            alt={profile.avatar.alt}
+            width={1254}
+            height={1254}
+            decoding="async"
+          />
+        </div>
         <div className={styles.info}>
           <h3>{profile.name}</h3>
           <p className={styles.role}>{profile.role}</p>

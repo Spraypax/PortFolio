@@ -2,7 +2,7 @@
 
 Base de portfolio personnel inspirée des interfaces PlayStation et PSP : fond bleu nuit, panneaux translucides, typographie technologique et composition modulaire.
 
-**Phase 1 — base du portfolio.** Les initiales, le rôle, la localisation, la biographie, l'introduction, les compétences, les étiquettes du profil, le parcours et le CV sont personnalisés. Les autres textes, les projets et les statistiques restent des données de démonstration. La PSP interactive et la photo de profil ne sont pas implémentées.
+**Phase 1 — base du portfolio.** Les initiales, le rôle, la localisation, la biographie, l'introduction, les compétences, les étiquettes du profil, le parcours et le CV sont personnalisés. Les autres textes, les projets et les statistiques restent des données de démonstration. Le portrait fourni est intégré dans Player 01. La PSP interactive n'est pas implémentée.
 
 ## Lancer le projet
 
@@ -104,7 +104,7 @@ Les fichiers fournis ont été **copiés sans modification** dans le projet :
 
 La Memory Card est une image indépendante, jamais reconstruite en CSS. Le badge est superposé sur le bord gauche des couvertures ; le désactiver avec `showPlaystationBadge: false` dans les données ou avec la prop du composant `ProjectCard`.
 
-**Avatar :** lors d'une phase ultérieure, créer `src/assets/images/profile/avatar.png`, puis intégrer explicitement l'image dans `ProfileCard`. Ce dossier n'est pas créé artificiellement tant qu'il est vide. **Déposer un fichier à cet emplacement ne l'affiche pas automatiquement : le cadre est volontairement vide dans cette première version.**
+**Avatar :** le portrait pixel-art fourni est copié sans modification dans `src/assets/images/profile/avatar.png`, puis importé par `src/data/profile.ts`. `ProfileCard` l'affiche centré avec `object-fit: cover` dans le cadre existant, dont les dimensions sont conservées. Le chemin et le texte alternatif sont centralisés dans `profile.avatar`.
 
 Les quatre couvertures de projets sont des illustrations SVG locales temporaires. Les remplacer en important les nouveaux visuels dans `src/data/projects.ts`. Il n'y a aucune image distante ni dépendance aux fichiers du dossier Téléchargements.
 
@@ -204,7 +204,7 @@ La navbar est transparente, sans flou ni aplat de couleur, et laisse apparaître
 
 ## Vérification
 
-Le build exécute TypeScript avant Vite. Vérifier également `npm run lint`, `npm run format:check`, les six ancres, la navigation mobile au clavier, l'absence de défilement horizontal aux principaux breakpoints, le cadre photo vide et l'absence de contenu dans `PspStage`.
+Le build exécute TypeScript avant Vite. Vérifier également `npm run lint`, `npm run format:check`, les six ancres, la navigation mobile au clavier, l'absence de défilement horizontal aux principaux breakpoints, le portrait centré dans le cadre Player 01 et l'absence de contenu dans `PspStage`.
 
 Pour Skills : vérifier l'absence des anciennes jauges, le mode compact non déroulable, le verrouillage pendant l'agrandissement, l'ouverture simultanée de plusieurs catégories, la fermeture par croix et Échap, le retour du focus et le défilement du panneau sur mobile.
 

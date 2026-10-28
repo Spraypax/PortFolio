@@ -1,10 +1,15 @@
 import cvUrl from '../assets/documents/DUPONT_Lelian_CV_ATS.pdf?url'
+import avatarUrl from '../assets/images/profile/avatar.png'
 
 // Profile details and biography provided by the portfolio owner.
 export const profile = {
   name: 'L.D',
   role: 'Cybersecurity student',
   location: 'Paris, FR',
+  avatar: {
+    url: avatarUrl,
+    alt: 'Pixel-art portrait in a dark hoodie',
+  },
   cv: {
     url: cvUrl,
     filename: 'DUPONT_Lélian_CV_ATS.pdf',
