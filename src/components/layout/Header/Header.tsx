@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BatteryFull, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import logo from '../../../assets/images/playstation/playstation-logo.png'
 import { profile } from '../../../data/profile'
 import { useClock } from '../../../hooks/useClock'
@@ -67,7 +67,6 @@ export function Header() {
         <time className={styles.clock} dateTime={clock.iso}>
           <span>{clock.date}</span>
           <span>{clock.time}</span>
-          <BatteryFull size={23} aria-hidden="true" />
         </time>
       </div>
     </header>

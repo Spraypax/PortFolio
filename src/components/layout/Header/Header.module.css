@@ -12,7 +12,7 @@
   margin: auto;
   padding: 4px var(--page-gutter);
   display: grid;
-  grid-template-columns: clamp(300px, 20vw, 340px) max-content minmax(0, 1fr) 324px 220px;
+  grid-template-columns: clamp(300px, 20vw, 340px) max-content minmax(0, 1fr) 324px max-content;
   align-items: center;
   column-gap: 16px;
 }
@@ -106,17 +106,10 @@
   }
   .clock {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 3px 8px;
+    grid-template-columns: 1fr;
+    gap: 3px;
     font-size: 0.66rem;
     text-align: right;
-  }
-  .clock span {
-    grid-column: 1;
-  }
-  .clock svg {
-    grid-column: 2;
-    grid-row: 1 / span 2;
   }
 }
 
@@ -161,8 +154,5 @@
     gap: 3px;
     text-align: right;
     font-size: 0.64rem;
-  }
-  .clock svg {
-    display: none;
   }
 }

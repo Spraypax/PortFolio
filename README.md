@@ -137,7 +137,7 @@ L'accessibilité comprend :
 - Accordéons indépendants avec `aria-expanded`, désactivés jusqu'à la fin de l'agrandissement.
 - Prise en compte de `prefers-reduced-motion` pour les animations, les transitions et le défilement.
 
-L'horloge affiche la date, l'année et l'heure en **anglais**, selon le fuseau horaire du navigateur. Elle se met à jour toutes les 15 secondes et ne demande aucune permission. L'icône de batterie est décorative.
+L'horloge affiche la date, l'année et l'heure en **anglais**, selon le fuseau horaire du navigateur. Elle se met à jour toutes les 15 secondes et ne demande aucune permission. Sa largeur suit son contenu, sans icône de batterie, pour garder l'alignement avec le lecteur musical.
 
 ## Introduction au portfolio
 
