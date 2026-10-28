@@ -139,6 +139,25 @@ L'accessibilité comprend :
 
 L'horloge affiche la date, l'année et l'heure en **anglais**, selon le fuseau horaire du navigateur. Elle se met à jour toutes les 15 secondes et ne demande aucune permission. L'icône de batterie est décorative.
 
+## Introduction au portfolio
+
+`IntroExperience`, ajouté autour d'`App` dans `src/main.tsx`, affiche une séquence originale inspirée des interfaces de consoles portables. Le portfolio se charge derrière l'overlay et reste `inert`, masqué aux technologies d'assistance et sans défilement jusqu'à la fin de la transition. Une ancre présente dans l'URL est repositionnée pendant la validation, avant de révéler le site. Le wrapper retrouve ensuite son rendu normal, sans transformation persistante ; les ancres, le header sticky et les dialogues existants gardent leur fonctionnement.
+
+Tout se configure dans **`src/data/intro.ts`** :
+
+- `durations` : préchargement de 160 ms, démarrage de 3 600 ms, passage au menu de 650 ms, validation de 580 ms et révélation de 1 950 ms. `reducedDurations` simplifie la séquence pour la réduction des mouvements.
+- `audio.boot`, `audio.enter` et `audio.volume` : fichiers locaux dans `src/assets/audio/` et volume. Les deux fichiers fournis sont copiés sans modification, préchargés et inclus dans le build.
+- `copy.enter` : libellé « Click to enter ». Les autres textes sont regroupés dans `copy` ; l'identité L.D et le rôle proviennent du profil existant.
+- `replay: 'always'` : rejouer à chaque chargement (valeur par défaut). Utiliser `'session'` pour une fois par session, ou `'disabled'` pour désactiver l'introduction. `sessionKey` permet de versionner la mémorisation. Recharger la page après un changement de configuration.
+
+`IntroSequence` n'autorise qu'un chemin `loading → booting → settling → ready → confirming → revealing → complete`. L'état `ready` attend obligatoirement un clic, un tap ou la validation clavier. « Skip animation » passe uniquement au menu d'entrée. Un seul délai est actif à la fois, indépendant des événements CSS : un échec d'animation ou de son ne bloque pas l'accès. Le premier appel de lecture est tenté automatiquement une seule fois ; si le navigateur le refuse, l'interface indique discrètement « Sound on entry ». Le deuxième son est appelé directement dans le geste utilisateur et une seule validation est acceptée. Il n'y a pas de contournement des [règles d'autoplay](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay).
+
+`IntroAudio` centralise les lectures, la sourdine, les erreurs et le nettoyage. La séquence et le son sont mis en pause lorsque l'onglet devient invisible, puis reprennent au retour. Les échéances, l'audio et les styles de scroll sont nettoyés au démontage, y compris avec StrictMode. La transition finale rend le focus au contenu principal et supprime l'overlay et ses éléments audio.
+
+Les vagues sont des SVG originaux, accompagnés de huit points lumineux. Les animations CSS emploient principalement `transform` et `opacity`, avec un flou bref lors de la révélation. Aucun asset officiel ni nouvelle bibliothèque n'est ajouté. Les timings de la montée du monogramme et de la validation correspondent aux attaques des deux sons. Le mode réduit retire les vagues animées et conserve une transition simple. L'objectif est la fluidité ; les performances réelles dépendent du navigateur et du matériel.
+
+Les tests `tests/intro.test.mjs` couvrent la progression, l'attente utilisateur, les actions répétées, les pauses, le nettoyage StrictMode, les modes de relecture et les erreurs audio. Les contrôles navigateur complètent ces tests pour le clavier, le responsive, les médias et le retour au portfolio.
+
 ## Panneau About Me
 
 Le bouton **About me** et toute la carte **Player 01** ouvrent une seule instance de `AboutDialog`, contrôlée depuis `Hero`. Les deux déclencheurs partagent `aria-controls` et l'état d'ouverture. L'animation part du déclencheur utilisé ; la croix et Échap referment le panneau vers ce même déclencheur et lui rendent le focus. Les tentatives d'ouverture pendant une ouverture, une fermeture ou lorsque le panneau est déjà ouvert sont ignorées.
