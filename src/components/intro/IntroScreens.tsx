@@ -64,7 +64,10 @@ export function EnterScreen({
           className={styles.enterButton}
           aria-label={intro.copy.enter}
           disabled={!ready}
-          onClick={onEnter}
+          onClick={(event) => {
+            event.stopPropagation()
+            onEnter()
+          }}
           onKeyDown={(event) => {
             if (event.repeat && (event.key === 'Enter' || event.key === ' ')) event.preventDefault()
           }}

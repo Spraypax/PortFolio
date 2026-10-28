@@ -13,6 +13,7 @@ export function useIntroExperience() {
   const [phase, setPhase] = useState<IntroPhase>(shouldRun ? 'loading' : 'complete')
   const [paused, setPaused] = useState(false)
   const [muted, setMuted] = useState(false)
+  const [bootRun, setBootRun] = useState(0)
   const [audioStatus, setAudioStatus] = useState<AudioStatus>('available')
   const [durations] = useState(() =>
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -87,6 +88,20 @@ export function useIntroExperience() {
     const next = !muted
     controller.current?.audio.setMuted(next)
     setMuted(next)
+    if (!next) recoverBootAudio()
+  }
+
+  function recoverBootAudio() {
+    const current = controller.current
+    if (
+      !current ||
+      document.hidden ||
+      !['loading', 'booting', 'settling'].includes(current.sequence.phase)
+    )
+      return
+    if (!current.audio.startBootFromGesture()) return
+    current.sequence.restartBoot()
+    setBootRun((run) => run + 1)
   }
 
   return {
@@ -101,5 +116,7 @@ export function useIntroExperience() {
     enter,
     skipBoot: () => controller.current?.sequence.skipBoot(),
     toggleSound,
+    recoverBootAudio,
+    bootRun,
   }
 }

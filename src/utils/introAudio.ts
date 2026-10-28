@@ -9,6 +9,10 @@ export class IntroAudio {
   private paused = false
   private disposed = false
   private onStatus: (status: AudioStatus) => void
+  private bootBlocked = false
+  private bootRetried = false
+  private bootStarted = false
+  private bootInFlight = false
 
   constructor(boot: Media, enter: Media, volume: number, onStatus: (status: AudioStatus) => void) {
     this.media = { boot, enter }
@@ -25,27 +29,60 @@ export class IntroAudio {
   }
 
   private tryPlay(media: Media) {
+    const boot = media === this.media.boot
+    if (boot) this.bootInFlight = true
     try {
       void media.play().then(
         () => {
+          if (boot) {
+            this.bootInFlight = false
+            this.bootStarted = true
+            this.bootBlocked = false
+          }
           if (this.disposed || this.paused || this.active !== media) media.pause()
           else this.onStatus('available')
         },
         (error: unknown) => {
-          if (this.active === media && !this.paused) this.reportFailure(error)
+          if (boot) this.bootInFlight = false
+          if (this.active === media && !this.paused) this.reportFailure(error, media)
         },
       )
     } catch (error) {
-      this.reportFailure(error)
+      if (boot) this.bootInFlight = false
+      this.reportFailure(error, media)
     }
   }
 
-  private reportFailure(error: unknown) {
+  private reportFailure(error: unknown, media: Media) {
     if (this.disposed) return
     if (error instanceof Error && error.name === 'AbortError') return
     this.active = null
     const blocked = error instanceof Error && error.name === 'NotAllowedError'
-    this.onStatus(blocked ? 'on-entry' : 'unavailable')
+    this.bootBlocked = blocked && media === this.media.boot && !this.bootRetried
+    this.onStatus(this.bootBlocked ? 'on-entry' : 'unavailable')
+  }
+
+  startBootFromGesture() {
+    if (
+      this.disposed ||
+      this.paused ||
+      this.media.boot.muted ||
+      this.bootInFlight ||
+      this.bootStarted
+    )
+      return false
+    if (!this.attempted.has('boot')) {
+      this.playOnce('boot')
+      return true
+    }
+    if (!this.bootBlocked || this.bootRetried) return false
+    // A trusted gesture can retry rejected autoplay, never an already playing sound.
+    this.bootRetried = true
+    this.bootBlocked = false
+    this.active?.pause()
+    this.active = this.media.boot
+    this.tryPlay(this.active)
+    return true
   }
 
   setMuted(muted: boolean) {

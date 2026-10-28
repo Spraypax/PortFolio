@@ -1,7 +1,6 @@
 import { useEffect, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
 import { intro } from '../../data/intro'
-import { profile } from '../../data/profile'
 import { useIntroExperience } from '../../hooks/useIntroExperience'
 import { IntroBackdrop } from './IntroBackdrop'
 import { BootScreen, EnterScreen } from './IntroScreens'
@@ -20,6 +19,8 @@ export function IntroExperience({ children }: { children: ReactNode }) {
     enter,
     skipBoot,
     toggleSound,
+    recoverBootAudio,
+    bootRun,
   } = useIntroExperience()
   const overlayRef = useRef<HTMLDivElement>(null)
   const enterRef = useRef<HTMLButtonElement>(null)
@@ -125,55 +126,89 @@ export function IntroExperience({ children }: { children: ReactNode }) {
             data-phase={phase}
             data-paused={paused}
             onKeyDown={containFocus}
+            onClick={(event) => {
+              if (event.button !== 0) return
+              if (phase === 'ready') enter()
+              else if (boot) recoverBootAudio()
+            }}
             style={timing}
           >
             <IntroBackdrop />
             <header className={styles.topBar}>
-              <span className={styles.systemBrand}>
-                {profile.name} <span>/</span> PORTFOLIO SYSTEM
-              </span>
+              <span className={styles.systemBrand}>PORTFOLIO</span>
               {boot ? (
-                <button ref={skipRef} type="button" className={styles.skip} onClick={skipBoot}>
+                <button
+                  ref={skipRef}
+                  type="button"
+                  className={styles.skip}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    skipBoot()
+                  }}
+                >
                   Skip animation <span aria-hidden="true">↗</span>
                 </button>
               ) : (
                 <span className={styles.readyStatus}>SYSTEM READY</span>
               )}
             </header>
-            <BootScreen visible={boot} />
+            <BootScreen key={bootRun} visible={boot} />
             <EnterScreen phase={phase} enterRef={enterRef} onEnter={enter} />
             <footer className={styles.bottomBar}>
               <span className={styles.systemOnline}>
                 <i aria-hidden="true" />
                 {boot ? 'SYSTEM INITIALIZING' : 'SYSTEM ONLINE'}
               </span>
-              <span className={styles.motto}>{intro.copy.footer}</span>
-              <button
-                type="button"
-                className={styles.sound}
-                aria-label={muted ? 'Enable sound' : 'Mute sound'}
-                aria-pressed={!muted}
-                disabled={phase === 'confirming' || phase === 'revealing'}
-                onClick={toggleSound}
-              >
-                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                <span>
-                  {muted
-                    ? 'Sound off'
-                    : audioStatus === 'on-entry'
-                      ? 'Sound on entry'
+              {boot ? (
+                <button
+                  type="button"
+                  className={styles.sound}
+                  aria-label={
+                    muted
+                      ? 'Enable sound'
+                      : audioStatus === 'on-entry'
+                        ? 'Enable startup sound'
+                        : 'Mute sound'
+                  }
+                  aria-pressed={!muted}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    if (audioStatus === 'on-entry' && !muted) recoverBootAudio()
+                    else toggleSound()
+                  }}
+                >
+                  {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                  <span>
+                    {muted
+                      ? 'Sound off'
+                      : audioStatus === 'on-entry'
+                        ? 'Enable sound'
+                        : audioStatus === 'unavailable'
+                          ? 'Visual mode'
+                          : 'Sound on'}
+                  </span>
+                </button>
+              ) : (
+                <span className={styles.sound}>
+                  {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                  <span>
+                    {muted
+                      ? 'Sound off'
                       : audioStatus === 'unavailable'
                         ? 'Visual mode'
                         : 'Sound on'}
+                  </span>
                 </span>
-              </button>
+              )}
             </footer>
             <span className="sr-only" role="status" aria-live="polite">
               {phase === 'ready'
                 ? 'System ready. Click to enter the portfolio.'
                 : phase === 'confirming'
                   ? 'Opening portfolio.'
-                  : ''}
+                  : boot && audioStatus === 'on-entry'
+                    ? 'Enable sound to hear the startup sequence.'
+                    : ''}
             </span>
           </div>
         </>

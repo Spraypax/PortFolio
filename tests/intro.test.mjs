@@ -188,3 +188,63 @@ test('pending play promises cannot restart audio after cleanup', async (t) => {
   assert.equal(pause.mock.callCount(), 2)
   assert.deepEqual(status, [])
 })
+
+test('a trusted gesture recovers blocked boot audio exactly once, then leaves entry audio unchanged', async (t) => {
+  const boot = media()
+  const enter = media()
+  let attempts = 0
+  const bootPlay = t.mock.method(boot, 'play', async () => {
+    if (++attempts === 1) {
+      throw Object.assign(new Error('Blocked'), { name: 'NotAllowedError' })
+    }
+  })
+  const entryPlay = t.mock.method(enter, 'play')
+  const status = []
+  const controller = new IntroAudio(boot, enter, 0.7, (value) => status.push(value))
+  controller.playOnce('boot')
+  await Promise.resolve()
+  assert.equal(status.at(-1), 'on-entry')
+  assert.equal(controller.startBootFromGesture(), true)
+  for (let click = 0; click < 20; click++) assert.equal(controller.startBootFromGesture(), false)
+  await Promise.resolve()
+  assert.equal(controller.startBootFromGesture(), false)
+  assert.equal(status.at(-1), 'available')
+  assert.equal(bootPlay.mock.callCount(), 2)
+  controller.playOnce('enter')
+  controller.playOnce('enter')
+  assert.equal(entryPlay.mock.callCount(), 1)
+  controller.dispose()
+})
+
+test('a rejected recovery fails quietly without retry loops or an entry gate', async (t) => {
+  const boot = media(async () => {
+    throw Object.assign(new Error('Blocked'), { name: 'NotAllowedError' })
+  })
+  const play = t.mock.method(boot, 'play')
+  const status = []
+  const controller = new IntroAudio(boot, media(), 0.7, (value) => status.push(value))
+  controller.playOnce('boot')
+  await Promise.resolve()
+  controller.startBootFromGesture()
+  await Promise.resolve()
+  assert.equal(status.at(-1), 'unavailable')
+  assert.equal(controller.startBootFromGesture(), false)
+  assert.equal(play.mock.callCount(), 2)
+  controller.dispose()
+})
+
+test('audio recovery resynchronizes only the boot deadline and cannot interrupt entry', (t) => {
+  const { flow } = flowEnvironment(t)
+  flow.start()
+  t.mock.timers.tick(160)
+  t.mock.timers.tick(2100)
+  assert.equal(flow.restartBoot(), true)
+  t.mock.timers.tick(3599)
+  assert.equal(flow.phase, 'booting')
+  t.mock.timers.tick(1)
+  assert.equal(flow.phase, 'settling')
+  flow.skipBoot()
+  assert.equal(flow.restartBoot(), false)
+  flow.enter()
+  assert.equal(flow.restartBoot(), false)
+})

@@ -23,10 +23,9 @@ export const intro = {
   copy: {
     system: 'Personal system / 01',
     boot: 'Initializing your experience',
-    ready: 'Welcome, Player 01.',
+    ready: 'Welcome',
     enter: 'Click to enter',
     hint: 'Click, tap or press Enter',
     selection: 'Opening portfolio',
-    footer: 'Good games. Better ideas.',
   },
 }

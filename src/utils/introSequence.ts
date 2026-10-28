@@ -56,6 +56,13 @@ export class IntroSequence {
     this.moveTo('ready')
   }
 
+  restartBoot() {
+    if (this.disposed || this.paused || !['loading', 'booting', 'settling'].includes(this.phase))
+      return false
+    this.moveTo('booting')
+    return true
+  }
+
   enter() {
     if (this.disposed || this.paused || this.phase !== 'ready') return false
     this.moveTo('confirming')

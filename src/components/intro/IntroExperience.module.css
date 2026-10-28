@@ -22,6 +22,9 @@
 .overlay:focus {
   outline: none;
 }
+.overlay[data-phase='ready'] {
+  cursor: pointer;
+}
 .atmosphere {
   position: absolute;
   inset: 0;
@@ -123,10 +126,6 @@
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
-.systemBrand > span {
-  color: #53749e;
-  padding-inline: 8px;
-}
 .skip,
 .sound {
   display: inline-flex;
@@ -169,10 +168,6 @@
   border-radius: 50%;
   background: #83bbff;
   box-shadow: 0 0 8px rgb(100 173 255 / 45%);
-}
-.motto {
-  font-size: 0.63rem;
-  letter-spacing: 0.12em;
 }
 .bootScreen,
 .enterScreen {
@@ -509,9 +504,6 @@
     font-size: 0.57rem;
     letter-spacing: 0.06em;
   }
-  .systemBrand > span {
-    padding-inline: 3px;
-  }
   .skip {
     font-size: 0.62rem;
     padding-inline: 5px;
@@ -519,9 +511,6 @@
   .readyStatus {
     font-size: 0.5rem;
     letter-spacing: 0.08em;
-  }
-  .motto {
-    display: none;
   }
   .bootScreen,
   .enterScreen {
