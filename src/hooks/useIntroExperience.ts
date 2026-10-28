@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { intro } from '../data/intro'
-import { IntroAudio, type AudioStatus } from '../utils/introAudio'
+import { IntroAudio, type AudioStatus, type BootPlaybackReport } from '../utils/introAudio'
 import {
   IntroSequence,
   rememberIntro,
   shouldShowIntro,
   type IntroPhase,
 } from '../utils/introSequence'
+
+function reportBootPlayback(report: BootPlaybackReport) {
+  console.info('[intro:boot]', JSON.stringify(report))
+}
 
 export function useIntroExperience() {
   const [shouldRun] = useState(() => shouldShowIntro(intro.replay, intro.sessionKey))
@@ -40,6 +44,7 @@ export function useIntroExperience() {
       enterAudio.current,
       intro.audio.volume,
       setAudioStatus,
+      import.meta.env.DEV ? reportBootPlayback : undefined,
     )
     const sequence = new IntroSequence(durations, (next) => {
       setPhase(next)

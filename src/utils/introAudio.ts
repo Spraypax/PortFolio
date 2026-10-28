@@ -1,5 +1,11 @@
 type Sound = 'boot' | 'enter'
 export type AudioStatus = 'available' | 'on-entry' | 'unavailable'
+export type BootPlaybackReport = {
+  attempt: number
+  result: 'attempt' | 'playing' | 'blocked' | 'aborted' | 'failed'
+  currentTime: number
+  error?: { name: string; message: string }
+}
 type Media = Pick<
   HTMLAudioElement,
   'play' | 'pause' | 'muted' | 'volume' | 'ended' | 'currentTime' | 'load'
@@ -17,10 +23,19 @@ export class IntroAudio {
   private bootStarted = false
   private bootInFlight = false
   private playbackRequest = 0
+  private bootAttempts = 0
+  private onBootPlayback?: (report: BootPlaybackReport) => void
 
-  constructor(boot: Media, enter: Media, volume: number, onStatus: (status: AudioStatus) => void) {
+  constructor(
+    boot: Media,
+    enter: Media,
+    volume: number,
+    onStatus: (status: AudioStatus) => void,
+    onBootPlayback?: (report: BootPlaybackReport) => void,
+  ) {
     this.media = { boot, enter }
     this.onStatus = onStatus
+    this.onBootPlayback = onBootPlayback
     boot.volume = enter.volume = volume
   }
 
@@ -36,7 +51,11 @@ export class IntroAudio {
   private tryPlay(media: Media) {
     const request = ++this.playbackRequest
     const boot = media === this.media.boot
-    if (boot) this.bootInFlight = true
+    if (boot) {
+      this.bootInFlight = true
+      ++this.bootAttempts
+      this.reportBoot('attempt')
+    }
     try {
       void media.play().then(
         () => {
@@ -45,6 +64,7 @@ export class IntroAudio {
             this.bootInFlight = false
             this.bootStarted = true
             this.bootBlocked = false
+            this.reportBoot('playing')
           }
           if (this.paused || this.active !== media) media.pause()
           else this.onStatus('available')
@@ -60,6 +80,15 @@ export class IntroAudio {
       if (boot) this.bootInFlight = false
       this.reportFailure(error, media)
     }
+  }
+
+  private reportBoot(result: BootPlaybackReport['result'], error?: unknown) {
+    this.onBootPlayback?.({
+      attempt: this.bootAttempts,
+      result,
+      currentTime: this.media.boot.currentTime,
+      ...(error instanceof Error ? { error: { name: error.name, message: error.message } } : {}),
+    })
   }
 
   private resetBoot() {
@@ -78,6 +107,16 @@ export class IntroAudio {
 
   private reportFailure(error: unknown, media: Media) {
     if (this.disposed) return
+    if (media === this.media.boot) {
+      this.reportBoot(
+        error instanceof Error && error.name === 'NotAllowedError'
+          ? 'blocked'
+          : error instanceof Error && error.name === 'AbortError'
+            ? 'aborted'
+            : 'failed',
+        error,
+      )
+    }
     if (error instanceof Error && error.name === 'AbortError') return
     this.active = null
     const blocked = error instanceof Error && error.name === 'NotAllowedError'

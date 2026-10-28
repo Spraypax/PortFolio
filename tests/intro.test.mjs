@@ -17,9 +17,10 @@ function media(play = async () => {}) {
   return { play, pause() {}, load() {}, currentTime: 0, muted: false, volume: 1, ended: false }
 }
 
-test('the complete startup always waits for user input before revealing the site', (t) => {
+test('startup reaches Welcome automatically and waits for input only before revealing the site', (t) => {
   const { flow, states } = flowEnvironment(t)
   flow.start()
+  assert.equal(flow.enter(), false)
   for (const delay of [160, 3600, 650]) t.mock.timers.tick(delay)
   assert.equal(flow.phase, 'ready')
   t.mock.timers.tick(60000)
@@ -250,6 +251,51 @@ test('audio recovery resynchronizes only the boot deadline and cannot interrupt 
   assert.equal(flow.restartBoot(), false)
 })
 
+test('repeated start calls cannot restart automatic loading or boot playback', (t) => {
+  const { flow, states } = flowEnvironment(t)
+  flow.start()
+  for (let call = 0; call < 20; call++) flow.start()
+  t.mock.timers.tick(durations.loading)
+  assert.equal(flow.phase, 'booting')
+  flow.start()
+  t.mock.timers.tick(durations.booting)
+  t.mock.timers.tick(durations.settling)
+  assert.deepEqual(states, ['loading', 'booting', 'settling', 'ready'])
+})
+
+test('each fresh intro attempts boot audio automatically and reaches Welcome even if autoplay is blocked', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 10000 })
+  for (const blocked of [false, true, true, false, true, false]) {
+    const boot = media(async () => {
+      if (blocked) throw new DOMException('User interaction required', 'NotAllowedError')
+    })
+    boot.currentTime = 3.544
+    const enter = media()
+    const play = t.mock.method(boot, 'play')
+    const entryPlay = t.mock.method(enter, 'play')
+    const status = []
+    const audio = new IntroAudio(boot, enter, 0.7, (value) => status.push(value))
+    const flow = new IntroSequence(durations, (phase) => {
+      if (phase === 'booting') audio.playOnce('boot')
+      if (phase === 'ready') audio.stop()
+    })
+    flow.start()
+    t.mock.timers.tick(durations.loading)
+    await Promise.resolve()
+    assert.equal(play.mock.callCount(), 1)
+    assert.equal(boot.currentTime, 0)
+    assert.equal(status.at(-1), blocked ? 'on-entry' : 'available')
+    t.mock.timers.tick(durations.booting)
+    t.mock.timers.tick(durations.settling)
+    assert.equal(flow.phase, 'ready')
+    assert.equal(entryPlay.mock.callCount(), 0)
+    if (flow.enter()) audio.playOnce('enter')
+    assert.equal(entryPlay.mock.callCount(), 1)
+    audio.dispose()
+    flow.dispose()
+  }
+})
+
 test('each new controller rewinds boot playback and attempts it again after repeated reloads', async (t) => {
   const boot = media()
   const entry = media()
@@ -306,4 +352,81 @@ test('boot preload can recover when seeking is unavailable before metadata', (t)
   assert.equal(load.mock.callCount(), 1)
   assert.equal(play.mock.callCount(), 1)
   controller.dispose()
+})
+
+test('boot reports preserve the exact rejection reason without changing entry playback', async () => {
+  for (const [name, result] of [
+    ['NotAllowedError', 'blocked'],
+    ['AbortError', 'aborted'],
+    ['NotSupportedError', 'failed'],
+  ]) {
+    const reports = []
+    const boot = media(async () => {
+      throw new DOMException('Browser playback refusal', name)
+    })
+    const controller = new IntroAudio(
+      boot,
+      media(),
+      0.7,
+      () => {},
+      (report) => reports.push(report),
+    )
+    controller.playOnce('boot')
+    await Promise.resolve()
+    assert.deepEqual(reports, [
+      { attempt: 1, result: 'attempt', currentTime: 0 },
+      {
+        attempt: 1,
+        result,
+        currentTime: 0,
+        error: { name, message: 'Browser playback refusal' },
+      },
+    ])
+    controller.playOnce('enter')
+    await Promise.resolve()
+    assert.equal(reports.length, 2)
+    controller.dispose()
+  }
+})
+
+test('an autoplay refusal never prevents a fresh page from attempting boot audio again', async () => {
+  const results = []
+  for (const blocked of [false, true, true, false, true, false]) {
+    const reports = []
+    const boot = media(async () => {
+      if (blocked) throw new DOMException('User interaction required', 'NotAllowedError')
+    })
+    boot.currentTime = 3.544
+    const controller = new IntroAudio(
+      boot,
+      media(),
+      0.7,
+      () => {},
+      (report) => reports.push(report),
+    )
+    controller.playOnce('boot')
+    await Promise.resolve()
+    assert.deepEqual(reports[0], { attempt: 1, result: 'attempt', currentTime: 0 })
+    results.push(reports.at(-1).result)
+    controller.dispose()
+  }
+  assert.deepEqual(results, ['playing', 'blocked', 'blocked', 'playing', 'blocked', 'playing'])
+})
+
+test('late boot promises emit no diagnostics for a disposed introduction', async () => {
+  let reject
+  const reports = []
+  const boot = media(() => new Promise((_, fail) => (reject = fail)))
+  const controller = new IntroAudio(
+    boot,
+    media(),
+    0.7,
+    () => {},
+    (report) => reports.push(report),
+  )
+  controller.playOnce('boot')
+  controller.dispose()
+  reject(new DOMException('Old document', 'AbortError'))
+  await Promise.resolve()
+  assert.deepEqual(reports, [{ attempt: 1, result: 'attempt', currentTime: 0 }])
 })
