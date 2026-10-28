@@ -5,13 +5,13 @@ export function Footer() {
   return (
     <footer className={styles.footer}>
       <p>
-        <Triangle size={14} aria-hidden="true" /> Good games. Better websites.
+        <Triangle size={14} aria-hidden="true" /> cybersecurity, cloud &amp; infrastructure
       </p>
       <p className={styles.demo}>
         Phase 01 <span aria-hidden="true">/</span> Demo content
       </p>
-      <p lang="ja">
-        遊び続けよう。
+      <p>
+        Portfolio
         <span className={styles.line} aria-hidden="true" />
       </p>
     </footer>
