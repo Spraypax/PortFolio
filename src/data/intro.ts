@@ -21,7 +21,7 @@ export const intro = {
     revealing: 400,
   } satisfies IntroDurations,
   copy: {
-    system: 'Personal system / 01',
+    system: 'System / 01',
     boot: 'Initializing your experience',
     ready: 'Welcome',
     enter: 'Click to enter',

@@ -1,6 +1,9 @@
 type Sound = 'boot' | 'enter'
 export type AudioStatus = 'available' | 'on-entry' | 'unavailable'
-type Media = Pick<HTMLAudioElement, 'play' | 'pause' | 'muted' | 'volume' | 'ended'>
+type Media = Pick<
+  HTMLAudioElement,
+  'play' | 'pause' | 'muted' | 'volume' | 'ended' | 'currentTime' | 'load'
+>
 
 export class IntroAudio {
   private media: Record<Sound, Media>
@@ -13,6 +16,7 @@ export class IntroAudio {
   private bootRetried = false
   private bootStarted = false
   private bootInFlight = false
+  private playbackRequest = 0
 
   constructor(boot: Media, enter: Media, volume: number, onStatus: (status: AudioStatus) => void) {
     this.media = { boot, enter }
@@ -24,32 +28,51 @@ export class IntroAudio {
     if (this.disposed || this.attempted.has(sound)) return
     this.attempted.add(sound)
     this.active?.pause()
+    if (sound === 'boot') this.resetBoot()
     this.active = this.media[sound]
     this.tryPlay(this.active)
   }
 
   private tryPlay(media: Media) {
+    const request = ++this.playbackRequest
     const boot = media === this.media.boot
     if (boot) this.bootInFlight = true
     try {
       void media.play().then(
         () => {
+          if (this.disposed || request !== this.playbackRequest) return
           if (boot) {
             this.bootInFlight = false
             this.bootStarted = true
             this.bootBlocked = false
           }
-          if (this.disposed || this.paused || this.active !== media) media.pause()
+          if (this.paused || this.active !== media) media.pause()
           else this.onStatus('available')
         },
         (error: unknown) => {
+          if (this.disposed || request !== this.playbackRequest) return
           if (boot) this.bootInFlight = false
           if (this.active === media && !this.paused) this.reportFailure(error, media)
         },
       )
     } catch (error) {
+      if (this.disposed || request !== this.playbackRequest) return
       if (boot) this.bootInFlight = false
       this.reportFailure(error, media)
+    }
+  }
+
+  private resetBoot() {
+    const boot = this.media.boot
+    boot.pause()
+    try {
+      boot.currentTime = 0
+    } catch {
+      try {
+        boot.load()
+      } catch {
+        // play() reports an unavailable decoder without blocking the visual sequence.
+      }
     }
   }
 
@@ -80,6 +103,7 @@ export class IntroAudio {
     this.bootRetried = true
     this.bootBlocked = false
     this.active?.pause()
+    this.resetBoot()
     this.active = this.media.boot
     this.tryPlay(this.active)
     return true
@@ -90,6 +114,8 @@ export class IntroAudio {
   }
 
   pause() {
+    ++this.playbackRequest
+    this.bootInFlight = false
     this.paused = true
     this.active?.pause()
   }
@@ -101,6 +127,8 @@ export class IntroAudio {
   }
 
   stop() {
+    ++this.playbackRequest
+    this.bootInFlight = false
     this.active?.pause()
     this.active = null
   }

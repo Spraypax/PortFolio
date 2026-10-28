@@ -14,7 +14,7 @@ function flowEnvironment(t) {
 }
 
 function media(play = async () => {}) {
-  return { play, pause() {}, muted: false, volume: 1, ended: false }
+  return { play, pause() {}, load() {}, currentTime: 0, muted: false, volume: 1, ended: false }
 }
 
 test('the complete startup always waits for user input before revealing the site', (t) => {
@@ -162,7 +162,7 @@ test('visibility resumes the same audio element without resetting playback', (t)
   controller.pause()
   controller.resume()
   assert.equal(play.mock.callCount(), 2)
-  assert.equal(pause.mock.callCount(), 1)
+  assert.equal(pause.mock.callCount(), 2)
   controller.stop()
   controller.pause()
   controller.resume()
@@ -183,9 +183,10 @@ test('pending play promises cannot restart audio after cleanup', async (t) => {
   const controller = new IntroAudio(boot, media(), 0.7, (value) => status.push(value))
   controller.playOnce('boot')
   controller.dispose()
+  const pausesAfterCleanup = pause.mock.callCount()
   finishPlay()
   await Promise.resolve()
-  assert.equal(pause.mock.callCount(), 2)
+  assert.equal(pause.mock.callCount(), pausesAfterCleanup)
   assert.deepEqual(status, [])
 })
 
@@ -247,4 +248,62 @@ test('audio recovery resynchronizes only the boot deadline and cannot interrupt 
   assert.equal(flow.restartBoot(), false)
   flow.enter()
   assert.equal(flow.restartBoot(), false)
+})
+
+test('each new controller rewinds boot playback and attempts it again after repeated reloads', async (t) => {
+  const boot = media()
+  const entry = media()
+  const play = t.mock.method(boot, 'play', async () => {
+    assert.equal(boot.currentTime, 0)
+  })
+  for (let reload = 0; reload < 5; reload++) {
+    boot.currentTime = 3.544
+    boot.ended = true
+    entry.currentTime = 1.5
+    const controller = new IntroAudio(boot, entry, 0.7, () => {})
+    controller.playOnce('boot')
+    controller.playOnce('boot')
+    await Promise.resolve()
+    assert.equal(entry.currentTime, 1.5)
+    controller.dispose()
+  }
+  assert.equal(play.mock.callCount(), 5)
+})
+
+test('a cleaned-up controller cannot pause a newer controller sharing the same media element', async (t) => {
+  const pending = []
+  const boot = media(() => new Promise((resolve) => pending.push(resolve)))
+  const pause = t.mock.method(boot, 'pause')
+  const oldStatus = []
+  const newStatus = []
+  const oldController = new IntroAudio(boot, media(), 0.7, (value) => oldStatus.push(value))
+  oldController.playOnce('boot')
+  oldController.dispose()
+  const newController = new IntroAudio(boot, media(), 0.7, (value) => newStatus.push(value))
+  newController.playOnce('boot')
+  const pausesBeforeOldPromise = pause.mock.callCount()
+  pending[0]()
+  await Promise.resolve()
+  assert.equal(pause.mock.callCount(), pausesBeforeOldPromise)
+  assert.deepEqual(oldStatus, [])
+  pending[1]()
+  await Promise.resolve()
+  assert.deepEqual(newStatus, ['available'])
+  newController.dispose()
+})
+
+test('boot preload can recover when seeking is unavailable before metadata', (t) => {
+  const boot = media()
+  Object.defineProperty(boot, 'currentTime', {
+    set() {
+      throw new Error('No metadata')
+    },
+  })
+  const load = t.mock.method(boot, 'load')
+  const play = t.mock.method(boot, 'play')
+  const controller = new IntroAudio(boot, media(), 0.7, () => {})
+  assert.doesNotThrow(() => controller.playOnce('boot'))
+  assert.equal(load.mock.callCount(), 1)
+  assert.equal(play.mock.callCount(), 1)
+  controller.dispose()
 })

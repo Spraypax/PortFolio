@@ -150,11 +150,6 @@
   color: white;
   background: rgb(58 141 255 / 8%);
 }
-.readyStatus {
-  font-size: 0.59rem;
-  color: var(--color-blue-300);
-  letter-spacing: 0.16em;
-}
 .systemOnline {
   display: flex;
   align-items: center;
@@ -507,10 +502,6 @@
   .skip {
     font-size: 0.62rem;
     padding-inline: 5px;
-  }
-  .readyStatus {
-    font-size: 0.5rem;
-    letter-spacing: 0.08em;
   }
   .bootScreen,
   .enterScreen {

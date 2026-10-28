@@ -33,15 +33,8 @@ export function IntroExperience({ children }: { children: ReactNode }) {
     if (phase === 'ready') {
       enterRef.current?.focus({ preventScroll: true })
     }
-    if (phase === 'confirming' && window.location.hash) {
-      // Native fragment scrolling may be skipped while the page is hidden/inert.
-      let id = window.location.hash.slice(1)
-      try {
-        id = decodeURIComponent(id)
-      } catch {
-        // A malformed fragment still permits entry and a literal ID lookup.
-      }
-      document.getElementById(id)?.scrollIntoView({ behavior: 'instant', block: 'start' })
+    if (phase === 'loading' || phase === 'confirming' || phase === 'complete') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
     }
     if (phase === 'complete' && shouldRun) {
       document.getElementById('main-content')?.focus({ preventScroll: true })
@@ -136,7 +129,7 @@ export function IntroExperience({ children }: { children: ReactNode }) {
             <IntroBackdrop />
             <header className={styles.topBar}>
               <span className={styles.systemBrand}>PORTFOLIO</span>
-              {boot ? (
+              {boot && (
                 <button
                   ref={skipRef}
                   type="button"
@@ -148,8 +141,6 @@ export function IntroExperience({ children }: { children: ReactNode }) {
                 >
                   Skip animation <span aria-hidden="true">↗</span>
                 </button>
-              ) : (
-                <span className={styles.readyStatus}>SYSTEM READY</span>
               )}
             </header>
             <BootScreen key={bootRun} visible={boot} />
@@ -203,7 +194,7 @@ export function IntroExperience({ children }: { children: ReactNode }) {
             </footer>
             <span className="sr-only" role="status" aria-live="polite">
               {phase === 'ready'
-                ? 'System ready. Click to enter the portfolio.'
+                ? 'Click to enter the portfolio.'
                 : phase === 'confirming'
                   ? 'Opening portfolio.'
                   : boot && audioStatus === 'on-entry'
