@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { IntroSequence, shouldShowIntro, rememberIntro } from '../src/utils/introSequence.ts'
-import { IntroAudio } from '../src/utils/introAudio.ts'
+import {
+  IntroSequence,
+  shouldShowIntro,
+  rememberIntro,
+} from '../src/features/intro/introSequence.ts'
+import { IntroAudio } from '../src/features/intro/introAudio.ts'
 
 const durations = { loading: 160, booting: 3600, settling: 650, confirming: 580, revealing: 1950 }
 

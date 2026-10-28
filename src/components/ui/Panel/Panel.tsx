@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { SectionTitle } from '../SectionTitle/SectionTitle'
+import { SectionTitle } from '@/components/ui/SectionTitle/SectionTitle'
 import styles from './Panel.module.css'
 
 interface PanelProps {

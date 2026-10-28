@@ -1,6 +1,6 @@
 import type { LucideProps } from 'lucide-react'
 import type { ComponentType } from 'react'
-import { GithubIcon, LinkedinIcon, RootMeIcon } from '../components/ui/BrandIcons'
+import { GithubIcon, LinkedinIcon, RootMeIcon } from '@/components/ui/BrandIcons'
 
 interface SocialLink {
   name: string

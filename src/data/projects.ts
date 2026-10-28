@@ -1,10 +1,10 @@
-import honeypot from '../assets/images/projects/honeypot.png'
-import vulnerabilityScanner from '../assets/images/projects/vulnerability-scanner.png'
-import rat from '../assets/images/projects/rat.png'
-import portfolio from '../assets/images/projects/portfolio.png'
-import type { Project } from '../types/project'
+import honeypot from '@/assets/images/projects/honeypot.png'
+import vulnerabilityScanner from '@/assets/images/projects/vulnerability-scanner.png'
+import rat from '@/assets/images/projects/rat.png'
+import portfolio from '@/assets/images/projects/portfolio.png'
+import type { Project } from '@/types/project'
 
-// Sample projects and original placeholder illustrations; no fabricated external links.
+// Project content, local artwork and repository links supplied by the portfolio owner.
 export const projects: Project[] = [
   {
     id: 'honeypot',

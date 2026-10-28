@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { highlightNavigationTarget } from '../utils/navigationHighlight'
+import { highlightNavigationTarget } from '@/utils/navigationHighlight'
 
 export function useNavigationHighlight() {
   const cleanup = useRef<() => void>(() => {})

@@ -1,5 +1,5 @@
 import { Activity, BrainCircuit, Cloud, Database, ShieldCheck, Terminal } from 'lucide-react'
-import type { SkillCategory } from '../types/skill'
+import type { SkillCategory } from '@/types/skill'
 
 export const skillCategories: SkillCategory[] = [
   {

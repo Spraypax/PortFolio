@@ -1,5 +1,5 @@
 import { Briefcase, GraduationCap } from 'lucide-react'
-import type { Experience, ExperienceCategory } from '../types/experience'
+import type { Experience, ExperienceCategory } from '@/types/experience'
 
 // Experience details provided by the portfolio owner.
 export const experience: Experience[] = [

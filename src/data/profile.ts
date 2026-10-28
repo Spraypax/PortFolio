@@ -1,5 +1,5 @@
-import cvUrl from '../assets/documents/DUPONT_Lelian_CV_ATS.pdf?url'
-import avatarUrl from '../assets/images/profile/avatar.png'
+import cvUrl from '@/assets/documents/DUPONT_Lelian_CV_ATS.pdf?url'
+import avatarUrl from '@/assets/images/profile/avatar.png'
 
 // Profile details and biography provided by the portfolio owner.
 export const profile = {

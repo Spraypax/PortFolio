@@ -1,0 +1,106 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(900px, calc(100% - 40px));
+  height: min(700px, calc(100dvh - 40px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: clamp(20px, 3vw, 36px);
+  border: 1px solid rgb(126 181 255 / 55%);
+  border-radius: 12px;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  background:
+    radial-gradient(ellipse at top right, rgb(85 96 191 / 18%), transparent 65%),
+    linear-gradient(130deg, rgb(100 137 209 / 12%), transparent 55%), rgb(8 21 46 / 96%);
+  box-shadow:
+    0 30px 100px rgb(0 3 15 / 65%),
+    inset 0 1px 0 rgb(190 218 255 / 18%),
+    0 0 40px rgb(58 141 255 / 12%);
+  transform-origin: top left;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: rgb(1 5 16 / 65%);
+  backdrop-filter: blur(7px);
+  animation: backdrop-in 440ms ease both;
+}
+
+.dialog[data-phase='closing']::backdrop {
+  animation: backdrop-out 300ms ease both;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  margin-bottom: 24px;
+}
+
+.dialogHeader > :first-child {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.closeButton {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-blue-300);
+  background: rgb(41 74 125 / 20%);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.closeButton:hover {
+  border-color: var(--color-border-active);
+  background: rgb(72 118 191 / 25%);
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .dialog {
+    width: calc(100% - 24px);
+    height: calc(100dvh - 24px);
+    padding: 18px 14px;
+    border-radius: 8px;
+  }
+  .dialogHeader {
+    margin-bottom: 18px;
+  }
+  .closeButton {
+    width: 40px;
+    height: 40px;
+  }
+}

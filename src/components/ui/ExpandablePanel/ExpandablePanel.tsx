@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { useExpandingDialog } from '../../../hooks/useExpandingDialog'
-import { Panel } from '../Panel/Panel'
-import { ExpandingDialog } from '../ExpandingDialog/ExpandingDialog'
+import { useExpandingDialog } from '@/hooks/useExpandingDialog'
+import { Panel } from '@/components/ui/Panel/Panel'
+import { ExpandingDialog } from '@/components/ui/ExpandingDialog/ExpandingDialog'
 import styles from './ExpandablePanel.module.css'
 
 interface ExpandablePanelProps {

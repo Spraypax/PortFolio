@@ -1,8 +1,21 @@
+# Dependencies, production output and local verification artifacts
 node_modules/
 dist/
+coverage/
+.verification/
+
+# Local environment and generated files
 *.local
 .env
 .env.*
 !.env.example
 *.tsbuildinfo
-.verification/
+*.log
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json

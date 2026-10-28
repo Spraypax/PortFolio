@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { getYearsOfExperience, memory } from '../src/data/memory.ts'
-import { fetchRepositoryCount, getCachedRepositoryCount } from '../src/utils/githubRepositories.ts'
+import {
+  fetchRepositoryCount,
+  getCachedRepositoryCount,
+} from '../src/services/githubRepositories.ts'
 import viteConfig from '../vite.config.ts'
 
 function mockStorage(t) {

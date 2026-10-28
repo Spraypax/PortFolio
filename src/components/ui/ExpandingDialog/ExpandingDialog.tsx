@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
-import type { useExpandingDialog } from '../../../hooks/useExpandingDialog'
-import { SectionTitle } from '../SectionTitle/SectionTitle'
-import styles from '../ExpandablePanel/ExpandablePanel.module.css'
+import type { useExpandingDialog } from '@/hooks/useExpandingDialog'
+import { SectionTitle } from '@/components/ui/SectionTitle/SectionTitle'
+import styles from './ExpandingDialog.module.css'
 
 interface ExpandingDialogProps {
   id: string
