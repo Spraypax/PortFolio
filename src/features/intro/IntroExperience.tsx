@@ -1,5 +1,6 @@
 import { useEffect, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
+import { PortfolioReadyContext } from '@/app/portfolioReady'
 import { intro } from './introConfig'
 import { useIntroExperience } from './useIntroExperience'
 import { IntroBackdrop } from './IntroBackdrop'
@@ -89,7 +90,7 @@ export function IntroExperience({ children }: { children: ReactNode }) {
         data-paused={paused}
         style={timing}
       >
-        {children}
+        <PortfolioReadyContext value={!active}>{children}</PortfolioReadyContext>
       </div>
       {active && (
         <>

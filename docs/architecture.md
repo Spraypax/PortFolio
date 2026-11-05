@@ -25,6 +25,7 @@ Les anciennes couvertures `echoes.svg`, `pixel-garden.svg` et `skyline.svg`, san
 - **`sections/`** contient les composants spécifiques aux blocs du portfolio. Chaque section garde ses composants et styles voisins, sans ajouter un dossier par petit élément.
 - **`components/ui/`** rassemble les éléments partagés. `Panel`, `Button`, `Tag`, `SectionTitle` et `IconButton` servent plusieurs sections. `ExpandablePanel` compose l’aperçu compact et `ExpandingDialog` ; chacun possède ses propres styles. `AccordionItem` fournit les menus déroulants.
 - **`features/intro/`** contient toute la logique de démarrage et sa présentation. Les contrôleurs `IntroSequence` et `IntroAudio` restent indépendants de React pour être testés avec Node.js.
+- **`features/music/`** sépare le transport musical indépendant de React (`MusicController`), les chapitres, les préférences locales, les adaptateurs, le hook de coordination et les commandes détaillées. La playlist active utilise 19 MP3 locaux indépendants ; un adaptateur YouTube facultatif conserve un panneau vidéo officiel visible. Le mini-contrôleur conserve son emplacement dans `components/MusicPlayerPreview/`. Voir [le fonctionnement et les chapitres](music-player.md).
 - **`hooks/`** regroupe les hooks partagés. Le hook du compteur de dépôts reste auprès de la Memory Card, son seul consommateur.
 - **`services/`** isole les appels à l’API publique GitHub, leur validation et le cache local. Aucun secret n’est utilisé.
 - **`data/`**, **`types/`** et **`assets/`** séparent respectivement les contenus, leurs modèles et les ressources importées.
@@ -44,6 +45,8 @@ Les anciennes couvertures `echoes.svg`, `pixel-garden.svg` et `skyline.svg`, san
 ## Introduction PSP
 
 `main.tsx` installe le retour en haut de page, puis monte `IntroExperience` autour d’`App` avec React StrictMode.
+
+`app/portfolioReady.ts` fournit `PortfolioReadyContext`. L'introduction y publie son état terminé ; le lecteur musical utilise ce signal pour lancer une seule fois la première piste locale, après les effets sonores d'entrée. Un refus d'autoplay attend une action manuelle plutôt que de réessayer en boucle.
 
 ```text
 loading → booting → settling → ready

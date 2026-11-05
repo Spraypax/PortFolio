@@ -82,7 +82,7 @@ export function useExpandingDialog() {
     if (event.key !== 'Tab') return
     const controls = [
       ...event.currentTarget.querySelectorAll<HTMLElement>(
-        'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+        'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), iframe, [tabindex]:not([tabindex="-1"])',
       ),
     ].filter((element) => !element.closest('[inert]') && element.getClientRects().length > 0)
     const first = controls[0]

@@ -15,7 +15,7 @@ Je développe ce site avec React et Vite sur une seule page. J’utilise des anc
 - Contact par email avec copie de mon adresse et confirmation discrète ; liens vers mes profils GitHub, LinkedIn et Root-Me.
 - Mise en page responsive, navigation mobile, focus visible, dialogues au clavier et prise en compte de la réduction des mouvements.
 
-Pour le moment, je conserve le lecteur musical de la navbar comme aperçu visuel et les labels `Demo` des cartes projets via `isPlaceholder`. Je détaille plus bas l’intégration PSP interactive que je prévois d’ajouter.
+Le lecteur musical de la navbar contrôle une playlist de 19 fichiers audio locaux indépendants, découpés dans le MP3 fourni selon les chapitres de la vidéo source. Il démarre à la fin de l'introduction avec un volume de fond par défaut de 5 %, et propose lecture/pause, précédent/suivant, arrêt, volume mémorisé et égaliseur décoratif animé, sans dépendre d'un lecteur YouTube. Si le navigateur bloque le démarrage automatique, Play reste disponible. Je conserve les labels `Demo` des cartes projets via `isPlaceholder`. Je détaille plus bas l’intégration PSP interactive que je prévois d’ajouter.
 
 ## Stack technique
 
@@ -77,7 +77,7 @@ J’organise mon code de la manière suivante :
 src/
 ├── app/                  # Composition de la page et grilles principales
 ├── assets/
-│   ├── audio/            # Deux sons de l’introduction PSP
+│   ├── audio/            # Deux sons PSP et 19 pistes locales sous music/
 │   ├── documents/        # CV PDF
 │   └── images/           # backgrounds, music, playstation, profile, projects
 ├── components/
@@ -85,7 +85,8 @@ src/
 │   └── ui/               # Boutons, panneaux, tags, dialogues, accordéons, icônes
 ├── data/                 # Contenus du portfolio
 ├── features/
-│   └── intro/            # Écrans, décor, configuration, hook, séquence et audio
+│   ├── intro/            # Écrans, décor, configuration, hook, séquence et audio
+│   └── music/            # Playlist, transport, adaptateurs et commandes détaillées
 ├── hooks/                # Horloge, dialogues agrandissables, navigation
 ├── layouts/              # Header, Navigation et Footer
 ├── sections/
@@ -121,6 +122,8 @@ Je centralise les contenus de mon portfolio dans ces fichiers :
 | `src/data/skills.ts`                | Catégories et compétences                             |
 | `src/data/experience.ts`            | Chronologie compacte et parcours détaillés            |
 | `src/data/memory.ts`                | Profil de sauvegarde, GitHub, expérience et formation |
+| `src/data/music.ts`                 | Source musicale et 19 chapitres titrés et horodatés   |
+| `src/data/musicChapters.ts`         | Titres, crédits et timestamps vérifiés de la source   |
 | `src/data/socialLinks.ts`           | Email, texte de contact et réseaux sociaux            |
 | `src/features/intro/introConfig.ts` | Textes, durées, sons, volume et mode de relecture     |
 
@@ -135,6 +138,7 @@ Je regroupe mes ressources dans les dossiers suivants :
 - `src/assets/images/profile/` et `projects/` : portrait et couvertures des quatre projets.
 - `src/assets/images/music/player-cover.svg` : vignette du lecteur musical.
 - `src/assets/audio/psp-boot.m4a` et `psp-enter.m4a` : sons de démarrage et d’entrée.
+- `src/assets/audio/music/` : 19 MP3 indépendants pour le lecteur de la navbar.
 - `src/assets/documents/` : mon CV en PDF, téléchargé par le bouton **Download CV**.
 
 J’importe les médias depuis le code pour que Vite les inclue dans le build, sans dépendre du dossier Téléchargements de ma machine. Je regroupe les pictogrammes de marques dans `src/components/ui/BrandIcons.tsx`.
@@ -164,7 +168,7 @@ Pour cette intégration, je prévois :
 
 Je prévois cet assemblage en 2.5D, sans Three.js. Ces éléments décrivent la prochaine étape du projet ; je conserve actuellement la réserve responsive et l’introduction animée déjà fonctionnelle.
 
-Dans la navbar, je garde aussi `MusicPlayerPreview` comme préparation visuelle du lecteur musical : cadre bleu, vignette, libellé **Now Playing**, pictogrammes de lecture et égaliseur statique. Je n’y ai pas encore ajouté de lecture audio ni de commandes actives. Je l’affiche dès 1024 px et je le masque sur tablette et mobile.
+Dans la navbar, `MusicPlayerPreview` conserve le cadre bleu, la vignette, les dimensions et les pictogrammes existants, mais propose désormais un véritable contrôleur musical local. Sous 1024 px, une icône musicale ouvre les mêmes commandes dans le panneau complémentaire. Fermer ce panneau n'interrompt pas la musique. Le fonctionnement et la liste des chapitres sont décrits dans [la documentation du lecteur](docs/music-player.md).
 
 ## Vérifications
 
@@ -178,7 +182,7 @@ npm test
 npm run build
 ```
 
-Je teste la séquence d’introduction, les erreurs et réinitialisations audio, les dates et statistiques de la Memory Card, le cache GitHub, la mise en évidence après navigation et le retour en haut au chargement. Node.js 22 peut afficher des avertissements expérimentaux pour le retrait des types TypeScript et les timers simulés.
+Je teste la séquence d’introduction, les erreurs et réinitialisations audio, les chapitres et transports du lecteur musical, les préférences de volume, les dates et statistiques de la Memory Card, le cache GitHub, la mise en évidence après navigation et le retour en haut au chargement. Node.js 22 peut afficher des avertissements expérimentaux pour le retrait des types TypeScript et les timers simulés.
 
 Je complète ces tests avec les contrôles navigateur de [ma liste de vérification](docs/architecture.md#vérifications-dans-le-navigateur), notamment pour les deux sons, les dialogues, les liens et les principaux formats d’écran.
 
