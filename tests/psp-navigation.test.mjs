@@ -56,6 +56,8 @@ test('options consume navigation, toggle settings and preserve the underlying pa
   let state = apply(initialPSPState, { type: 'open', page: 'projects' })
   state = control(state, 'triangle')
   state = control(state, 'cross')
+  assert.equal(state.soundEnabled, false)
+  state = control(state, 'cross')
   assert.equal(state.soundEnabled, true)
   state = control(state, 'down')
   state = control(state, 'cross')
@@ -97,7 +99,7 @@ test('volume buttons bound the optional navigation effects independently of musi
   assert.equal(state.soundLevel, 0)
   for (let i = 0; i < 8; i++) state = control(state, 'volume-up')
   assert.equal(state.soundLevel, 3)
-  assert.equal(state.soundEnabled, false)
+  assert.equal(state.soundEnabled, true)
 })
 
 test('all requested keyboard shortcuts map to the same physical control identifiers', () => {

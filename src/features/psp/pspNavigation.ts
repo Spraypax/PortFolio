@@ -49,7 +49,7 @@ export const initialPSPState: PSPNavigationState = {
   history: [],
   panel: null,
   optionIndex: 0,
-  soundEnabled: false,
+  soundEnabled: true,
   soundLevel: 1,
   dimmed: false,
 }

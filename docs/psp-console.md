@@ -122,7 +122,7 @@ About est sélectionné au démarrage. La navigation ne modifie pas l’URL et n
 
 L’état est volontairement limité à la session React : l’actualisation revient au menu initial. Le mode agrandi partage **le même contrôleur** et conserve la sélection et la page. L’écran miniature est alors inerte pour l’accessibilité. Le dialogue natif gère le focus modal ; sa fermeture rend le focus au bouton d’ouverture. Échap revient d’abord dans la navigation, puis ferme la vue agrandie à l’accueil.
 
-Les sons sont des notes synthétisées localement, désactivées par défaut. Ils sont déclenchés uniquement après interaction, respectent le mute mémorisé du lecteur musical et ne modifient ni son volume de 5 %, ni sa position, ni ses événements. Une seule note de navigation est active à la fois. Un refus de Web Audio laisse la navigation silencieuse et fonctionnelle.
+Les sons sont des notes synthétisées localement, activées par défaut (`Navigation sounds: On`) et désactivables dans les options de la PSP. Ils sont déclenchés uniquement après interaction, respectent le mute mémorisé du lecteur musical et ne modifient ni son volume de 5 %, ni sa position, ni ses événements. Une seule note de navigation est active à la fois. Un refus de Web Audio laisse la navigation silencieuse et fonctionnelle.
 
 ## Reproduire ou modifier les rendus
 
