@@ -1,7 +1,7 @@
 """Re-export the editable master without rebuilding/overwriting manual model edits.
 
 blender -b --factory-startup --disable-autoexec --python scripts/psp/export_saved.py
-Add -- --check to verify the source + regenerate layout without rendering.
+Add -- --check to validate the source and coordinates without writing or rendering.
 """
 
 import os
@@ -32,7 +32,7 @@ if len(controls) != 13:
     raise ValueError("The source must contain all 13 tagged PSP controls.")
 scene.render.resolution_percentage = 100
 output = ROOT / "src/assets/images/psp"
-manifest = write_layout(scene, output, controls)
+manifest = write_layout(scene, output, controls, persist="--check" not in sys.argv)
 print(
     "SOURCE_VALIDATED:",
     len(controls),

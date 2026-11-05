@@ -1,12 +1,16 @@
-"""Adapt aXel's supplied PSP, retaining meshes/UVs, then render fixed 2.5D layers.
+"""Adapt the supplied Sony PSP FBX to the existing fixed 2.5D composition.
 
-blender -b --factory-startup --disable-autoexec --python scripts/psp/build_scene.py -- --preview
-Omit --preview to save the editable scene and export all production layers.
+blender -b --factory-startup --disable-autoexec --python scripts/psp/build_scene.py
+Flags after --: --preview (staged only), --staging, --save-only, --cpu.
+The former working model and exports remain in assets-source/psp/legacy-v1.
 """
 
-import bpy, math, os, sys
+import math
+import os
+import sys
 from pathlib import Path
-from mathutils import Vector
+import bpy
+from mathutils import Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.dont_write_bytecode = True
@@ -14,627 +18,354 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from render_layers import write_layout, render, export_layers
 
 SOURCE = ROOT / "assets-source/psp"
-OUT = ROOT / "src/assets/images/psp"
+MODEL = SOURCE / "model-v2"
+PREVIEW = "--preview" in sys.argv
+STAGING = PREVIEW or "--staging" in sys.argv
+OUT = ROOT / (
+    ".verification/psp-model-v2/rendered" if STAGING else "src/assets/images/psp"
+)
 (OUT / "buttons").mkdir(parents=True, exist_ok=True)
 (ROOT / ".verification/optix").mkdir(parents=True, exist_ok=True)
 os.environ["OPTIX_CACHE_PATH"] = str(ROOT / ".verification/optix")
-PREVIEW = "--preview" in sys.argv
-SIZE = (1620, 698)
-bpy.ops.wm.open_mainfile(
-    filepath=str(SOURCE / "PSP-original.blend"), load_ui=False, use_scripts=False
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.import_scene.fbx(filepath=str(MODEL / "psp_low_final.fbx"), use_anim=False)
+scene = bpy.context.scene
+scene["psp_model_source"] = (
+    "Sony PSP by Ilya Ostrovsky (strov) / CC Attribution / Sketchfab"
 )
-s = bpy.context.scene
-s.render.engine = "CYCLES"
-s.cycles.samples = 24 if PREVIEW else 48
-s.cycles.use_denoising = True
+scene["psp_press_travel"] = 0.016
+
+# The FBX facade is pitched 45 degrees. Bake the normalization so the existing
+# exporter still depresses controls along +Y, independently of imported origins.
+rotation = Matrix.Rotation(math.pi / 4, 4, "X")
+original_objects = [
+    obj for obj in bpy.data.objects if obj.type == "MESH" and obj.name != "ground"
+]
+for obj in original_objects:
+    obj.data.transform(rotation @ obj.matrix_world)
+    obj.parent = None
+    obj.matrix_world.identity()
+    obj["source_mesh"] = obj.name
+for obj in list(bpy.data.objects):
+    if obj not in original_objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
+
+root = bpy.data.collections.new("PSP_ROOT")
+scene.collection.children.link(root)
+groups = {}
+for name in (
+    "BODY",
+    "SCREEN",
+    "DPAD",
+    "ACTION_BUTTONS",
+    "SYSTEM_BUTTONS",
+    "ANALOG",
+    "REFLECTIONS",
+    "SHADOWS",
+    "STUDIO",
+):
+    groups[name] = bpy.data.collections.new(name)
+    root.children.link(groups[name])
+
+
+def group(obj, name):
+    for collection in list(obj.users_collection):
+        collection.objects.unlink(obj)
+    groups[name].objects.link(obj)
+
+
+for obj in original_objects:
+    group(obj, "BODY")
+
+# Reuse the working display plane and calibrated camera. The supplied mesh is
+# adapted to this frame; web layout and React state are not used to compensate.
+left, right = -0.047259196639060974, 0.04699507728219032
+bottom, top = -0.0015805531293153763, 0.05141345411539078
+target_left, target_right = -1.772465705871582, 0.9286899566650391
+target_bottom, target_top = 0.3342224657535553, 1.6434509754180908
+screen_y = -0.30799999833106995
+
+
+def normalize(point):
+    x, y, z = point
+    if x < left:
+        x = target_left + (x - left) * 24.5
+    elif x > right:
+        x = target_right + (x - right) * 19.5
+    else:
+        x = target_left + (x - left) / (right - left) * (target_right - target_left)
+    z = target_bottom + (z - bottom) / (top - bottom) * (target_top - target_bottom)
+    if z > target_top:
+        z = target_top + (z - target_top) * 0.70
+    if z < target_bottom:
+        z = target_bottom + (z - target_bottom) * 0.60
+    y = screen_y + (y + 0.03245572187) * 17
+    return Vector((x, y, z))
+
+
+for obj in original_objects:
+    for vertex in obj.data.vertices:
+        vertex.co = normalize(vertex.co)
+    obj.data.update()
+
+# Reconstruct all supplied Substance PBR maps, retaining UVs and topology.
+images = {}
+for key, suffix in [
+    ("albedo", "albedo.jpg"),
+    ("ao", "AO.jpg"),
+    ("roughness", "roughness.jpg"),
+    ("metallic", "metallic.jpg"),
+    ("normal", "normal.png"),
+    ("emissive", "emissive.jpg"),
+]:
+    image = bpy.data.images.load(
+        str(MODEL / "textures" / ("sony_psp_" + suffix)), check_existing=True
+    )
+    if key not in ("albedo", "emissive"):
+        image.colorspace_settings.name = "Non-Color"
+    images[key] = image
+
+
+def pbr_material(name, chrome=False, buttons=False):
+    material = bpy.data.materials.new(name)
+    material.use_nodes = True
+    nodes, links = material.node_tree.nodes, material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    bsdf.inputs["Coat Weight"].default_value = 0.14 if not chrome else 0.05
+    bsdf.inputs["Coat Roughness"].default_value = 0.22
+    bsdf.inputs["Specular IOR Level"].default_value = 0.35
+    links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
+    textures = {}
+    for key, image in images.items():
+        node = nodes.new("ShaderNodeTexImage")
+        node.image = image
+        node.label = key
+        textures[key] = node
+    tint = nodes.new("ShaderNodeMixRGB")
+    tint.blend_type = "MULTIPLY"
+    tint.inputs[0].default_value = 1
+    tint.inputs[2].default_value = (
+        (0.60, 0.76, 1, 1) if buttons else (0.70, 0.78, 0.90, 1)
+    )
+    links.new(textures["albedo"].outputs["Color"], tint.inputs[1])
+    ao = nodes.new("ShaderNodeMixRGB")
+    ao.blend_type = "MULTIPLY"
+    ao.inputs[0].default_value = 0.35
+    links.new(tint.outputs[0], ao.inputs[1])
+    links.new(textures["ao"].outputs["Color"], ao.inputs[2])
+    if chrome:
+        bsdf.inputs["Base Color"].default_value = (0.38, 0.46, 0.57, 1)
+        bsdf.inputs["Metallic"].default_value = 0.92
+    else:
+        links.new(ao.outputs[0], bsdf.inputs["Base Color"])
+        links.new(textures["metallic"].outputs["Color"], bsdf.inputs["Metallic"])
+    rough = nodes.new("ShaderNodeMapRange")
+    rough.inputs["To Min"].default_value = 0.16 if chrome else 0.18
+    rough.inputs["To Max"].default_value = 0.31 if chrome else 0.49
+    links.new(textures["roughness"].outputs["Color"], rough.inputs["Value"])
+    links.new(rough.outputs["Result"], bsdf.inputs["Roughness"])
+    normal = nodes.new("ShaderNodeNormalMap")
+    normal.inputs["Strength"].default_value = 0.55
+    links.new(textures["normal"].outputs["Color"], normal.inputs["Color"])
+    links.new(normal.outputs["Normal"], bsdf.inputs["Normal"])
+    links.new(textures["emissive"].outputs["Color"], bsdf.inputs["Emission Color"])
+    bsdf.inputs["Emission Strength"].default_value = 0.12
+    return material
+
+
+shell_material = pbr_material("V2 / graphite shell / supplied PBR")
+chrome_material = pbr_material(
+    "V2 / silver middle frame / supplied detail maps", chrome=True
+)
+button_material = pbr_material("V2 / black controls / blue legends", buttons=True)
+for obj in original_objects:
+    obj.data.materials.clear()
+    obj.data.materials.append(shell_material)
+middle = bpy.data.objects["middlepart_low"]
+middle.name = "ChromeEdges / middlepart_low"
+middle.data.materials[0] = chrome_material
+
+# Identities established from normalized geometry and front preview, not names.
+mapping = {
+    1: "up",
+    2: "right",
+    3: "down",
+    4: "left",
+    5: "triangle",
+    6: "circle",
+    7: "cross",
+    8: "square",
+    9: "home",
+    10: "volume-down",
+    11: "volume-up",
+    14: "select",
+    15: "start",
+}
+controls = {}
+for number, key in mapping.items():
+    obj = bpy.data.objects[f"button{number}_low"]
+    obj.name = key
+    obj["psp_control"] = key
+    obj.data.materials[0] = button_material
+    category = (
+        "DPAD" if number <= 4 else "ACTION_BUTTONS" if number <= 8 else "SYSTEM_BUTTONS"
+    )
+    group(obj, category)
+    controls[key] = [obj]
+for number, name in [
+    (12, "Display / decorative original button"),
+    (13, "Music / decorative original button"),
+]:
+    obj = bpy.data.objects[f"button{number}_low"]
+    obj.name = name
+    obj.data.materials[0] = button_material
+    group(obj, "SYSTEM_BUTTONS")
+
+screen = bpy.data.objects["screen_low"]
+screen.name = "ScreenOpening"
+group(screen, "SCREEN")
+holdout = bpy.data.materials.new("V2 / remove baked LCD menu")
+holdout.use_nodes = True
+nodes = holdout.node_tree.nodes
+nodes.clear()
+node = nodes.new("ShaderNodeHoldout")
+output = nodes.new("ShaderNodeOutputMaterial")
+holdout.node_tree.links.new(node.outputs[0], output.inputs["Surface"])
+screen.data.materials.clear()
+screen.data.materials.append(holdout)
+corners = [
+    Vector((x, screen_y, z))
+    for x, z in [
+        (target_left, target_top),
+        (target_right, target_top),
+        (target_right, target_bottom),
+        (target_left, target_bottom),
+    ]
+]
+for letter, point in zip("ABCD", corners):
+    marker = bpy.data.objects.new("ScreenCorner" + letter, None)
+    groups["SCREEN"].objects.link(marker)
+    marker.parent = screen
+    marker.location = point
+    marker.empty_display_size = 0.025
+
+glass = bpy.data.objects.new("ScreenGlass", screen.data.copy())
+groups["REFLECTIONS"].objects.link(glass)
+glass.location.y = -0.001
+glass.data.materials.clear()
+material = bpy.data.materials.new("V2 / clear LCD glass reflection")
+material.use_nodes = True
+nodes, links = material.node_tree.nodes, material.node_tree.links
+nodes.clear()
+output = nodes.new("ShaderNodeOutputMaterial")
+mix = nodes.new("ShaderNodeMixShader")
+mix.inputs[0].default_value = 0.025
+transparent = nodes.new("ShaderNodeBsdfTransparent")
+glossy = nodes.new("ShaderNodeBsdfGlossy")
+glossy.inputs["Roughness"].default_value = 0.16
+links.new(transparent.outputs[0], mix.inputs[1])
+links.new(glossy.outputs[0], mix.inputs[2])
+links.new(mix.outputs[0], output.inputs["Surface"])
+glass.data.materials.append(material)
+glass.hide_render = True
+
+scene.render.engine = "CYCLES"
+scene.cycles.samples = 24 if PREVIEW else 64
+scene.cycles.use_denoising = True
+scene.cycles.device = "CPU"
 if "--cpu" not in sys.argv:
     try:
         prefs = bpy.context.preferences.addons["cycles"].preferences
         prefs.compute_device_type = "OPTIX"
         prefs.get_devices()
-        devices = [d for d in prefs.devices if d.type == "OPTIX"]
-        if devices:
-            for d in prefs.devices:
-                d.use = d in devices
-            s.cycles.device = "GPU"
+        gpu = [device for device in prefs.devices if device.type == "OPTIX"]
+        if gpu:
+            for device in prefs.devices:
+                device.use = device in gpu
+            scene.cycles.device = "GPU"
     except Exception:
-        pass  # Blender without a compatible GPU uses the CPU renderer.
-s.render.resolution_x, s.render.resolution_y = SIZE
-s.render.resolution_percentage = 65 if PREVIEW else 100
-s.render.film_transparent = True
-s.render.image_settings.file_format = "WEBP"
-s.render.image_settings.color_mode = "RGBA"
-s.render.image_settings.quality = 95
-s.use_nodes = False
-s.view_settings.view_transform = "AgX"
-s.world.use_nodes = True
-s.world.node_tree.nodes.clear()
-bg = s.world.node_tree.nodes.new("ShaderNodeBackground")
-bg.inputs["Color"].default_value = (0.20, 0.24, 0.34, 1)
-bg.inputs["Strength"].default_value = 0.35
-wo = s.world.node_tree.nodes.new("ShaderNodeOutputWorld")
-s.world.node_tree.links.new(bg.outputs[0], wo.inputs["Surface"])
+        pass
+scene.render.resolution_x = 1620
+scene.render.resolution_y = 698
+scene.render.resolution_percentage = 65 if PREVIEW else 100
+scene.render.film_transparent = True
+scene.render.image_settings.file_format = "WEBP"
+scene.render.image_settings.color_mode = "RGBA"
+scene.render.image_settings.quality = 95
+scene.view_settings.view_transform = "AgX"
+world = bpy.data.worlds.new("V2 / cold studio world")
+scene.world = world
+world.use_nodes = True
+world.node_tree.nodes["Background"].inputs["Color"].default_value = (
+    0.20,
+    0.24,
+    0.34,
+    1,
+)
+world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.35
 
-# Drop only the old studio, floor and cameras. Original PSP geometry is retained.
-for o in list(bpy.data.objects):
-    if o.type in ("LIGHT", "CAMERA") or o.name in (
-        "Floor",
-        "Plane.001",
-        "Plane.002",
-        "Plane.006",
-        "Plane.007",
-        "Cube.002",
-    ):
-        bpy.data.objects.remove(o, do_unlink=True)
-root = bpy.data.collections.new("PSP_ROOT")
-s.collection.children.link(root)
-groups = {
-    name: bpy.data.collections.new(name)
-    for name in (
-        "BODY",
-        "SCREEN",
-        "DPAD",
-        "ACTION_BUTTONS",
-        "SYSTEM_BUTTONS",
-        "ANALOG",
-        "REFLECTIONS",
-        "SHADOWS",
-        "STUDIO",
+data = bpy.data.cameras.new("Fixed reference camera")
+camera = bpy.data.objects.new("Fixed reference camera", data)
+groups["STUDIO"].objects.link(camera)
+camera.location = (3.04951810836792, -11.258712768554688, -2.479764938354492)
+camera.rotation_euler = (1.8669365644454956, -0.13814565539360046, 0.2649903893470764)
+data.type = "PERSP"
+data.lens = 99.15277099609375
+data.sensor_width = 36
+data.shift_x = -0.007639590185135603
+data.shift_y = -0.028690390288829803
+data.dof.use_dof = False
+camera.lock_location = camera.lock_rotation = camera.lock_scale = (True, True, True)
+scene.camera = camera
+
+
+def area(name, position, power, width, height, color):
+    data = bpy.data.lights.new(name, "AREA")
+    data.energy = power
+    data.color = color
+    data.shape = "RECTANGLE"
+    data.size = width
+    data.size_y = height
+    obj = bpy.data.objects.new(name, data)
+    groups["STUDIO"].objects.link(obj)
+    obj.location = position
+    obj.rotation_euler = (
+        (Vector((-0.36, 0, 0.95)) - obj.location).to_track_quat("-Z", "Y").to_euler()
     )
-}
-for c in groups.values():
-    root.children.link(c)
 
 
-def group(o, name):
-    for c in list(o.users_collection):
-        c.objects.unlink(o)
-    groups[name].objects.link(o)
+area("Silver key", (-3, -4, 6), 440, 5, 2, (0.78, 0.86, 1))
+area("Blue rim", (-3, 1, 2.8), 340, 3, 1, (0.19, 0.40, 1))
+area("Violet rim", (3, 0.3, 3), 230, 3, 1, (0.49, 0.32, 1))
+area("Front fill", (0, -5, 1.4), 25, 4, 3, (0.60, 0.73, 1))
 
-
-# Bake original object transforms so all edits/pressed travel share world axes.
-for o in list(bpy.data.objects):
-    if o.type == "MESH":
-        o.data.transform(o.matrix_world)
-        o.matrix_world.identity()
-        for mod in o.modifiers:
-            if mod.type == "SUBSURF":
-                mod.levels = 3
-                mod.render_levels = 3
-        for p in o.data.polygons:
-            p.use_smooth = True
-        group(o, "BODY")
-
-
-def pbr(name, color, rough=0.26, metal=0, texture=None):
-    m = bpy.data.materials.new(name)
-    m.use_nodes = True
-    n = m.node_tree.nodes
-    n.clear()
-    links = m.node_tree.links
-    out = n.new("ShaderNodeOutputMaterial")
-    bs = n.new("ShaderNodeBsdfPrincipled")
-    bs.inputs["Base Color"].default_value = (*color, 1)
-    bs.inputs["Roughness"].default_value = rough
-    bs.inputs["Metallic"].default_value = metal
-    bs.inputs["Coat Weight"].default_value = 0.24
-    bs.inputs["Coat Roughness"].default_value = 0.22
-    links.new(bs.outputs["BSDF"], out.inputs["Surface"])
-    if texture:
-        # Preserve original UV inscriptions: red background -> graphite,
-        # white details -> cool silver. This changes the material, not the render.
-        im = n.new("ShaderNodeTexImage")
-        im.image = bpy.data.images[texture]
-        sep = n.new("ShaderNodeSeparateColor")
-        links.new(im.outputs["Color"], sep.inputs["Color"])
-        ramp = n.new("ShaderNodeValToRGB")
-        ramp.color_ramp.elements[0].position = 0.025
-        ramp.color_ramp.elements[0].color = (*color, 1)
-        ramp.color_ramp.elements[1].position = 0.7
-        ramp.color_ramp.elements[1].color = (0.48, 0.64, 0.83, 1)
-        links.new(sep.outputs["Green"], ramp.inputs[0])
-        links.new(ramp.outputs[0], bs.inputs["Base Color"])
-    noise = n.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 240
-    bump = n.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.10
-    bump.inputs["Distance"].default_value = 0.002
-    links.new(noise.outputs["Fac"], bump.inputs["Height"])
-    links.new(bump.outputs["Normal"], bs.inputs["Normal"])
-    return m
-
-
-shell = pbr(
-    "Graphite / original UV silver legends",
-    (0.002, 0.003, 0.005),
-    0.26,
-    0.05,
-    "bodyuv4.png",
-)
-shell.node_tree.nodes.get("Principled BSDF").inputs["Coat Weight"].default_value = 0.06
-shell.node_tree.nodes.get("Principled BSDF").inputs[
-    "Specular IOR Level"
-].default_value = 0.24
-black = pbr("Satin black recesses", (0.004, 0.006, 0.009), 0.4)
-chrome = pbr(
-    "Polished silver / blue studio reflections", (0.48, 0.57, 0.68), 0.22, 0.93
-)
-edge = pbr("Smoked shoulder chrome", (0.10, 0.14, 0.21), 0.20, 0.72)
-button = pbr(
-    "Black buttons / ice blue original symbols",
-    (0.008, 0.012, 0.019),
-    0.25,
-    0.15,
-    "buttonuv3.png",
-)
-dpadmat = pbr(
-    "Black directional pad / original symbols",
-    (0.006, 0.009, 0.014),
-    0.3,
-    0.05,
-    "pspuv3.png",
-)
-analogmat = pbr(
-    "Textured analog rubber", (0.003, 0.005, 0.008), 0.7, 0, "dbuttonuv.png"
-)
-maps = {
-    "Material.001": shell,
-    "border": chrome,
-    "Chrome": chrome,
-    "Material.002": edge,
-    "buttons": button,
-    "dpad": dpadmat,
-    "dbutton": analogmat,
-    "home": pbr("Home legend", (0.005, 0.008, 0.014), 0.32, 0, "homeuv.png"),
-    "start": pbr("Start legend", (0.005, 0.008, 0.014), 0.32, 0, "startuv.png"),
-    "select": pbr("Select legend", (0.005, 0.008, 0.014), 0.32, 0, "selectuv.png"),
-    "otherbuttons": pbr(
-        "System legends", (0.005, 0.008, 0.014), 0.3, 0, "otherbuttonsuv.png"
-    ),
-}
-for o in bpy.data.objects:
-    if o.type == "MESH":
-        for slot in o.material_slots:
-            if slot.material and slot.material.name in maps:
-                slot.material = maps[slot.material.name]
-for name in ("Circle.001", "Circle.002"):
-    bpy.data.objects[name].data.materials.clear()
-    bpy.data.objects[name].data.materials.append(black)
-
-# Expand the central display area, proportionately compressing the side wings.
-cx = -0.4218878
-
-
-def widen(x):
-    left, right = -1.6100945, 0.7663189
-    if left <= x <= right:
-        return cx + (x - cx) * 1.12
-    if x < left:
-        return (cx + (left - cx) * 1.12) + (x - left) * 0.87
-    return (cx + (right - cx) * 1.12) + (x - right) * 0.87
-
-
-for o in bpy.data.objects:
-    if o.type == "MESH":
-        for v in o.data.vertices:
-            v.co.x = widen(v.co.x)
-
-body = bpy.data.objects["body"]
-body.name = "MainShell"
-screen = bpy.data.objects["screen"]
-screen.name = "ScreenOpening"
-group(screen, "SCREEN")
-screen_corners = [
-    Vector((widen(x), -0.308, z))
-    for x, z in [
-        (-1.6100945, 1.6723446),
-        (0.7663189, 1.6723446),
-        (0.7663189, 0.308565),
-        (-1.6100945, 0.308565),
-    ]
-]
-
-# Holdout masks the complete display opening even where rear geometry lies behind.
-hold = bpy.data.materials.new("Screen aperture holdout")
-hold.use_nodes = True
-hold.node_tree.nodes.clear()
-hn = hold.node_tree.nodes.new("ShaderNodeHoldout")
-ho = hold.node_tree.nodes.new("ShaderNodeOutputMaterial")
-hold.node_tree.links.new(hn.outputs[0], ho.inputs["Surface"])
-for slot in body.material_slots:
-    if slot.material and slot.material.name == "screen":
-        slot.material = hold
-screen.data.materials.clear()
-screen.data.materials.append(hold)
-for v in screen.data.vertices:
-    v.co.y = -0.309
-
-
-def curve(name, coords, material, radius=0.006, category="BODY", closed=False):
-    d = bpy.data.curves.new(name, "CURVE")
-    d.dimensions = "3D"
-    d.resolution_u = 16
-    d.bevel_depth = radius
-    d.bevel_resolution = 3
-    sp = d.splines.new("POLY")
-    sp.points.add(len(coords) - 1)
-    for p, co in zip(sp.points, coords):
-        p.co = (*co, 1)
-    sp.use_cyclic_u = closed
-    o = bpy.data.objects.new(name, d)
-    groups[category].objects.link(o)
-    d.materials.append(material)
-    return o
-
-
-# Physical raised chrome trim follows the original perimeter (not a screen-space stroke).
-# Mesh silhouette boundary at its frontmost contour, sampled from evaluated original body.
-dg = bpy.context.evaluated_depsgraph_get()
-ev = body.evaluated_get(dg)
-mesh = ev.to_mesh()
-verts = [v.co.copy() for v in mesh.vertices]
-contour = []
-for i in range(160):
-    a = 2 * math.pi * i / 160
-    direction = Vector((math.cos(a), 0, math.sin(a)))
-    # Radial support is smooth and follows the original shell's rounded outline.
-    p = max(verts, key=lambda v: (v.x - cx) * direction.x + (v.z - 0.95) * direction.z)
-    if not contour or (p - contour[-1]).length > 0.001:
-        contour.append(Vector((p.x, -0.257, p.z)))
-ev.to_mesh_clear()
-curve("ChromeEdges / front seam", contour, chrome, 0.009, closed=True)
-curve(
-    "ChromeEdges / rear seam",
-    [(v.x, 0.028, v.z) for v in contour],
-    chrome,
-    0.008,
-    closed=True,
-)
-# Recess rim around LCD from its exact original opening dimensions.
-curve(
-    "ScreenFrame / inset silver lip",
-    [(v.x, -0.311, v.z) for v in screen_corners],
-    edge,
-    0.009,
-    closed=True,
-)
-
-
-def split_loose(obj):
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.separate(type="LOOSE")
-    bpy.ops.object.mode_set(mode="OBJECT")
-    return list(bpy.context.selected_objects)
-
-
-def center(obj):
-    vs = [v.co for v in obj.data.vertices]
-    return sum(vs, Vector()) / len(vs)
-
-
-controls = {}
-parts = split_loose(bpy.data.objects["buttons"])
-centers = [center(o) for o in parts]
-avg = sum(centers, Vector()) / len(centers)
-for o, p in zip(parts, centers):
-    dx, dz = p.x - avg.x, p.z - avg.z
-    key = (
-        ("circle" if dx > 0 else "square")
-        if abs(dx) > abs(dz)
-        else ("triangle" if dz > 0 else "cross")
-    )
-    o.name = key
-    group(o, "ACTION_BUTTONS")
-    controls[key] = [o]
-parts = split_loose(bpy.data.objects["dpad"])
-avg = sum([center(o) for o in parts], Vector()) / len(parts)
-for o in parts:
-    p = center(o)
-    dx, dz = p.x - avg.x, p.z - avg.z
-    key = (
-        ("right" if dx > 0 else "left")
-        if abs(dx) > abs(dz)
-        else ("up" if dz > 0 else "down")
-    )
-    o.name = "dpad-" + key
-    group(o, "DPAD")
-    controls[key] = [o]
-for name, key in [
-    ("Plane.004", "home"),
-    ("Plane.005", "start"),
-    ("Plane.008", "select"),
-]:
-    o = bpy.data.objects[name]
-    o.name = key
-    group(o, "SYSTEM_BUTTONS")
-    controls[key] = [o]
-parts = sorted(split_loose(bpy.data.objects["Circle.005"]), key=lambda o: center(o).x)
-for i, o in enumerate(parts):
-    key = ["volume-down", "volume-up", "display", "note"][min(i, 3)]
-    o.name = key
-    group(o, "SYSTEM_BUTTONS")
-    if i < 2:
-        controls[key] = [o]
-analog = bpy.data.objects["Circle"]
-analog.name = "Analog"
-group(analog, "ANALOG")
-
-# The old 2.61 shell UVs lose the tiny legends when subdivided in modern Blender.
-# Restore them as planar printed details, using the supplied texture's PS mark
-# and editable type/curves for the other labels.
-ink = pbr("Cool silver printed legends", (0.48, 0.59, 0.73), 0.5, 0.15)
-
-
-def label(name, text, x, z, size, material=ink, owner=None, font=None):
-    d = bpy.data.curves.new(name, "FONT")
-    d.body = text
-    d.align_x = "CENTER"
-    d.align_y = "CENTER"
-    d.size = size
-    d.extrude = 0
-    if font:
-        d.font = font
-    o = bpy.data.objects.new(name, d)
-    groups["BODY"].objects.link(o)
-    o.location = (x, -0.345, z)
-    o.rotation_euler = (math.pi / 2, 0, 0)
-    d.materials.append(material)
-    if owner:
-        controls[owner].append(o)
-    return o
-
-
-sonyfont = (
-    bpy.data.fonts.load("C:/Windows/Fonts/timesbd.ttf")
-    if Path("C:/Windows/Fonts/timesbd.ttf").exists()
-    else None
-)
-label("SONY print", "SONY", widen(1.14), 1.55, 0.105, font=sonyfont)
-for key, text in [("home", "⌂"), ("start", "START"), ("select", "SELECT")]:
-    p = center(controls[key][0])
-    label(key + " print", text, p.x, p.z, 0.034 if key != "home" else 0.055, owner=key)
-label("Volume print", "VOL", widen(-1.07), 0.153, 0.030)
-label("Power print", "POWER", widen(1.43), 0.43, 0.024)
-label("Hold print", "HOLD", widen(1.43), 0.31, 0.024)
-paths = [
-    [(0, 0.065), (0.125, 0.065), (0.125, 0.025), (0, 0.025), (0, -0.025)],
-    [(0.165, -0.025), (0.23, -0.025), (0.23, 0.065), (0.355, 0.065)],
-    [(0.39, 0.065), (0.515, 0.065), (0.515, 0.025), (0.39, 0.025), (0.39, -0.025)],
-]
-for i, path in enumerate(paths):
-    curve(
-        "PSP engraved logo " + str(i),
-        [(cx - 0.257 + x, -0.334, 0.16 + z) for x, z in path],
-        ink,
-        0.003,
-    )
-# PS mark copied directly by UV coordinates from the supplied, packed texture.
-dm = bpy.data.materials.new("Original PS decal")
-dm.use_nodes = True
-dn = dm.node_tree.nodes
-dn.clear()
-dl = dm.node_tree.links
-di = dn.new("ShaderNodeTexImage")
-di.image = bpy.data.images["bodyuv4.png"]
-ds = dn.new("ShaderNodeSeparateColor")
-dl.new(di.outputs["Color"], ds.inputs[0])
-dr = dn.new("ShaderNodeMath")
-dr.operation = "GREATER_THAN"
-dr.inputs[1].default_value = 0.45
-dl.new(ds.outputs["Green"], dr.inputs[0])
-dt = dn.new("ShaderNodeBsdfTransparent")
-dp = dn.new("ShaderNodeBsdfPrincipled")
-dp.inputs["Base Color"].default_value = (0.48, 0.59, 0.73, 1)
-dp.inputs["Roughness"].default_value = 0.5
-dx = dn.new("ShaderNodeMixShader")
-do = dn.new("ShaderNodeOutputMaterial")
-dl.new(dr.outputs[0], dx.inputs[0])
-dl.new(dt.outputs[0], dx.inputs[1])
-dl.new(dp.outputs[0], dx.inputs[2])
-dl.new(dx.outputs[0], do.inputs[0])
-mx = widen(-2.02)
-mz = 1.58
-dd = bpy.data.meshes.new("PS print plane")
-dd.from_pydata(
-    [
-        (mx - 0.072, -0.332, mz - 0.06),
-        (mx + 0.072, -0.332, mz - 0.06),
-        (mx + 0.072, -0.332, mz + 0.06),
-        (mx - 0.072, -0.332, mz + 0.06),
-    ],
-    [],
-    [(0, 1, 2, 3)],
-)
-uv = dd.uv_layers.new()
-coords = [(0.119, 0.55), (0.157, 0.55), (0.157, 0.62), (0.119, 0.62)]
-for lp in dd.loops:
-    uv.data[lp.index].uv = coords[lp.vertex_index]
-decal = bpy.data.objects.new("Original PlayStation print", dd)
-groups["BODY"].objects.link(decal)
-dd.materials.append(dm)
-for x, z in [
-    (widen(-1.78), 1.54),
-    (widen(0.98), 1.46),
-    (widen(-2.27), 0.58),
-    (widen(1.50), 0.53),
-]:
-    bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=20, ring_count=8, radius=1, location=(x, -0.323, z)
-    )
-    o = bpy.context.object
-    o.name = "Speaker recess"
-    o.scale = (0.031, 0.004, 0.022)
-    o.data.materials.append(black)
-    group(o, "BODY")
-
-# Fine joystick knurling is real geometry and catches the studio light.
-ap = center(analog)
-for i in range(-7, 8):
-    for j in range(-7, 8):
-        dx, dz = i * 0.015, j * 0.015
-        if dx * dx + dz * dz < 0.011:
-            bpy.ops.mesh.primitive_uv_sphere_add(
-                segments=6,
-                ring_count=4,
-                radius=0.0035,
-                location=(ap.x + dx, -0.351, ap.z + dz),
-            )
-            o = bpy.context.object
-            o.name = "Analog knurl"
-            o.data.materials.append(black)
-            group(o, "ANALOG")
-
-camdata = bpy.data.cameras.new("Fixed reference camera")
-cam = bpy.data.objects.new("Fixed reference camera", camdata)
-groups["STUDIO"].objects.link(cam)
-target = Vector((cx, -0.308, 0.98884))
-# Least-squares calibration against the four display corners of the 810x349 reference.
-yaw, pitch = 0.306981733, -0.293234740
-cam.location = (
-    target
-    + Vector(
-        (
-            math.sin(yaw) * math.cos(pitch),
-            -math.cos(yaw) * math.cos(pitch),
-            math.sin(pitch),
-        )
-    )
-    * 12
-)
-cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
-cam.rotation_euler.rotate_axis("Z", 0.144347704)
-camdata.type = "PERSP"
-camdata.lens = 99.15277
-camdata.sensor_width = 36
-camdata.shift_x = -0.00763959
-camdata.shift_y = -0.02869039
-camdata.dof.use_dof = False
-cam.lock_location = (True, True, True)
-cam.lock_rotation = (True, True, True)
-cam.lock_scale = (True, True, True)
-s.camera = cam
-
-
-def light(name, loc, energy, size, color, target=(-0.36, 0, 0.95), size_y=None):
-    d = bpy.data.lights.new(name, "AREA")
-    d.energy = energy
-    d.color = color
-    d.shape = "RECTANGLE"
-    d.size = size
-    d.size_y = size_y or size
-    o = bpy.data.objects.new(name, d)
-    groups["STUDIO"].objects.link(o)
-    o.location = loc
-    o.rotation_euler = (Vector(target) - o.location).to_track_quat("-Z", "Y").to_euler()
-
-
-light("Softbox / silver key", (-3, -4, 6), 440, 5, (0.78, 0.86, 1), size_y=2)
-light("Blue rim", (-3, 1, 2.8), 340, 3, (0.19, 0.40, 1), size_y=1)
-light("Violet edge", (3, 0.3, 3), 230, 3, (0.49, 0.32, 1), size_y=1)
-light("Front fill", (0, -5, 1.4), 25, 4, (0.60, 0.73, 1), size_y=3)
-
-# Separate physical glass with transparent substrate and faint reflected softbox.
-glassmesh = bpy.data.meshes.new("LCD glass geometry")
-glassmesh.from_pydata([(v.x, -0.313, v.z) for v in screen_corners], [], [(0, 3, 2, 1)])
-glassmesh.update()
-glass = bpy.data.objects.new("ScreenGlass", glassmesh)
-groups["REFLECTIONS"].objects.link(glass)
-gm = bpy.data.materials.new("LCD clear glass reflection")
-gm.use_nodes = True
-gn = gm.node_tree.nodes
-gn.clear()
-gl = gm.node_tree.links
-go = gn.new("ShaderNodeOutputMaterial")
-mix = gn.new("ShaderNodeMixShader")
-mix.inputs[0].default_value = 0.035
-tr = gn.new("ShaderNodeBsdfTransparent")
-gs = gn.new("ShaderNodeBsdfGlossy")
-gs.inputs["Roughness"].default_value = 0.16
-gl.new(tr.outputs[0], mix.inputs[1])
-gl.new(gs.outputs[0], mix.inputs[2])
-gl.new(mix.outputs[0], go.inputs["Surface"])
-glass.data.materials.append(gm)
-glass.hide_render = True
-
-# Ground shadow can be exported without showing the console itself (ray visibility).
 bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, 0.012))
 ground = bpy.context.object
 ground.name = "Shadow catcher"
 ground.is_shadow_catcher = True
 group(ground, "SHADOWS")
 ground.hide_render = True
-ground.data.materials.append(pbr("Neutral shadow receiver", (0.08, 0.09, 0.12), 1))
-
-# Fit the original silhouette to the reference's wide PSP-1000 proportions.
-from mathutils import Matrix
-
-fit = (
-    Matrix.Translation(Vector((cx, 0, 0.95)))
-    @ Matrix.Diagonal((1.014868, 1, 0.96, 1))
-    @ Matrix.Translation(Vector((-cx, 0, -0.95)))
+neutral = bpy.data.materials.new("V2 / neutral shadow receiver")
+neutral.use_nodes = True
+neutral.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
+    0.08,
+    0.09,
+    0.12,
+    1,
 )
-for o in bpy.data.objects:
-    if o.type in ("MESH", "CURVE", "FONT") and o != ground:
-        o.matrix_world = fit @ o.matrix_world
-screen_corners = [fit @ v for v in screen_corners]
+neutral.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 1
+ground.data.materials.append(neutral)
 
-# Refine only the outer wings/margins to the image; the calibrated LCD is fixed.
-left_edge = screen_corners[0].x
-right_edge = screen_corners[1].x
-top_edge = screen_corners[0].z
-bottom_edge = screen_corners[2].z
-
-
-def silhouette(v):
-    v = v.copy()
-    if v.x < left_edge:
-        v.x -= min(1, (left_edge - v.x) / 0.35) * 0.12
-    if v.x > right_edge + 0.68:
-        v.x -= min(1, (v.x - right_edge - 0.68) / 0.3) * 0.105
-    if v.z > top_edge:
-        v.z -= min(1, (v.z - top_edge) / 0.18) * 0.055
-    if v.z < bottom_edge:
-        v.z += min(1, (bottom_edge - v.z) / 0.30) * 0.03
-    return v
-
-
-for o in bpy.data.objects:
-    if o == ground or o.type not in ("MESH", "CURVE", "FONT"):
-        continue
-    inv = o.matrix_world.inverted()
-    if o.type == "MESH":
-        for v in o.data.vertices:
-            v.co = inv @ silhouette(o.matrix_world @ v.co)
-    elif o.type == "CURVE":
-        for sp in o.data.splines:
-            for p in sp.points:
-                co = inv @ silhouette(o.matrix_world @ Vector(p.co[:3]))
-                p.co = (*co, 1)
-    else:
-        o.location = silhouette(o.location)
-
-for letter, point in zip("ABCD", screen_corners):
-    marker = bpy.data.objects.new("ScreenCorner" + letter, None)
-    groups["SCREEN"].objects.link(marker)
-    marker.parent = screen
-    marker.location = screen.matrix_world.inverted() @ point
-    marker.empty_display_size = 0.025
-for key, objs in controls.items():
-    for o in objs:
-        o["psp_control"] = key
-write_layout(s, OUT, controls)
-print("CONTROLS", list(controls.keys()), flush=True)
-
+bpy.context.view_layer.update()
+write_layout(scene, OUT, controls)
 if PREVIEW:
-    render(s, ROOT / ".verification/psp-adapted-preview.webp")
+    render(scene, ROOT / ".verification/psp-model-v2/preview.webp")
 else:
-    # Store a fully editable master with idle button geometry and locked camera.
     bpy.ops.file.pack_all()
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(SOURCE / "PSP-portfolio.blend"))
     if "--save-only" not in sys.argv:
-        export_layers(s, OUT, controls)
+        export_layers(scene, OUT, controls)

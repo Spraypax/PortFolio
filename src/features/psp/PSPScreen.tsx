@@ -275,13 +275,13 @@ function PSPOverlay({ controls }: { controls: PSPControls }) {
             projects and skills.
           </p>
           <p>
-            PSP model by{' '}
-            <a href="https://www.blendswap.com/blends/view/25546" target="_blank" rel="noreferrer">
-              aXel
-            </a>{' '}
-            ·{' '}
-            <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">
-              CC BY 3.0
+            Sony PSP by Ilya Ostrovsky (@strov), via{' '}
+            <a
+              href="https://sketchfab.com/3d-models/sony-psp-dca89d10ec304d0cab76837750df7761"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Sketchfab · CC Attribution
             </a>
             . Adapted materials, details and fixed renders.
           </p>

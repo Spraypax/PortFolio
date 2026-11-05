@@ -4,13 +4,33 @@ Run with Python + Pillow after build_scene.py. No geometry or camera is changed.
 The exact same rectangle is used for both states, preserving their alignment.
 """
 
+import argparse
 import json
 from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "src/assets/images/psp"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--assets-dir", type=Path, default=ROOT / "src/assets/images/psp")
+OUT = parser.parse_args().assets_dir.resolve()
 layout = json.loads((OUT / "layout.json").read_text())
+expected_controls = {
+    "up",
+    "down",
+    "left",
+    "right",
+    "cross",
+    "circle",
+    "triangle",
+    "square",
+    "home",
+    "start",
+    "select",
+    "volume-down",
+    "volume-up",
+}
+if set(layout["buttons"]) != expected_controls:
+    raise ValueError("Expected exactly the 13 existing PSP controls")
 canvas = (layout["width"], layout["height"])
 total = 0
 for name, button in layout["buttons"].items():
@@ -20,9 +40,11 @@ for name, button in layout["buttons"].items():
         path = OUT / button[state]
         with Image.open(path) as source:
             image = source.convert("RGBA")
+        bounds = image.getchannel("A").getbbox()
+        if not bounds:
+            raise ValueError(f"{name}/{state}: export is empty")
         if image.size == canvas:
-            bounds = image.getchannel("A").getbbox()
-            if bounds and not (
+            if not (
                 bounds[0] >= x
                 and bounds[1] >= y
                 and bounds[2] <= x + width
