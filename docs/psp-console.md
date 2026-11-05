@@ -63,7 +63,7 @@ La vitre mélange transparence et réflexion selon **Fresnel, IOR 1,46, multipli
 
 Les comparaisons d’aperçus avant/après montrent un noir plus profond, des reflets directionnels plus lisibles autour de l’écran et une meilleure perception du relief des commandes. La seconde candidate réduit la brillance des boutons système et du reflet gauche par rapport à la première. Ces observations ne constituent pas une certification de photoréalisme ni une reproduction exacte de la référence : celle-ci présente un plastique plus finement texturé et satiné, des symboles plus bleutés et des détails différents.
 
-Une [comparaison visuelle conservée dans le repository](images/psp-realism-comparison.webp) présente la référence, l’état avant réglage et la composition finale dans le portfolio. Cette dernière inclut tous les calques et l’ombre atténuée ; elle a également été inspectée, au-delà des aperçus monoblocs.
+Une [comparaison visuelle conservée dans le repository](images/psp-realism-comparison.webp) présente la référence, l’état avant réglage et la composition au moment de la validation du réalisme. Cette capture historique inclut l’ombre atténuée, retirée ensuite de l’affichage à la demande de l’utilisateur.
 
 Les vingt meshes adaptés de la source totalisent **29 974 vertices et 58 200 triangles**, hors vitre dupliquée et récepteur d’ombre. Leur silhouette, leurs UV, les inscriptions et les détails peints restent ceux de la source adaptée. Le réglage de matériaux ne remplace pas la topologie par un modèle plus détaillé ; les grandes surfaces planes restent planes. Les logos, les petits libellés et les boutons décoratifs ne sont pas redessinés. L’illustration d’écran reste également distincte de celle de la référence.
 
@@ -139,7 +139,9 @@ Les noms des ressources et des commandes restent inchangés pour React ; les rec
 
 ## Architecture React et commandes
 
-`PSPConsole` assemble l’ombre, l’écran, la coque, les boutons, la vitre et les reflets. Les calques décoratifs n’interceptent aucun clic. Les deux images de chaque bouton sont chargées dès le montage ; un fondu de 60 ms à l’appui et 95 ms au relâchement accompagne le changement d’état. La préférence de réduction des animations supprime ce fondu.
+`PSPConsole` assemble l’écran, la coque, les boutons, la vitre et les reflets. Le calque extérieur `psp-shadow.webp` reste disponible dans les exports Blender, mais n’est plus importé ni affiché dans le portfolio. Les ombres de relief intégrées aux matériaux de la coque et des boutons restent conservées. Les calques décoratifs n’interceptent aucun clic. Les deux images de chaque bouton sont chargées dès le montage ; un fondu de 60 ms à l’appui et 95 ms au relâchement accompagne le changement d’état. La préférence de réduction des animations supprime ce fondu.
+
+Le texte visible des raccourcis sous la console a été retiré ; les raccourcis eux-mêmes et les indications accessibles aux lecteurs d’écran restent disponibles. L’agrandissement utilise une icône discrète alignée en bas à droite sous la console, avec le nom accessible et l’infobulle « Agrandir l’écran ». Sa zone mesure 32 × 28 px sur desktop/tablette et 40 × 40 px sur mobile. La barre reste dans le flux sous 1024 px.
 
 `usePSPControls` constitue le point d’entrée commun souris/tactile/clavier. Il gère les appuis, relâchements, annulations de pointeur, pertes de focus et sons optionnels. `pspNavigation.ts` contient le réducteur pur : page actuelle, sélection, page d’origine, détail, historique, panneaux d’aide/options/crédits, luminosité et sons.
 

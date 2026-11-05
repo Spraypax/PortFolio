@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, PointerEvent } from 'react'
 import { Maximize2, X } from 'lucide-react'
 import body from '@/assets/images/psp/psp-body.webp'
-import shadow from '@/assets/images/psp/psp-shadow.webp'
 import glass from '@/assets/images/psp/psp-screen-glass.webp'
 import reflections from '@/assets/images/psp/psp-reflections.webp'
 import layout from '@/assets/images/psp/layout.json'
@@ -166,12 +165,6 @@ export function PSPConsole() {
         style={{ aspectRatio: `${layout.width} / ${layout.height}` }}
       >
         <div className={styles.canvas} style={{ width: layout.width, height: layout.height }}>
-          <img
-            className={`${styles.layer} ${styles.shadow}`}
-            src={shadow}
-            alt=""
-            draggable={false}
-          />
           <div
             className={styles.screenPlane}
             style={{
@@ -198,13 +191,14 @@ export function PSPConsole() {
         </div>
       </div>
       <div className={styles.toolbar}>
-        <span aria-hidden="true">↑ ↓ ← → · Entrée · Échap</span>
         <button
           ref={opener}
           type="button"
           data-psp-native
           className={styles.expandButton}
           aria-haspopup="dialog"
+          aria-label="Agrandir l’écran"
+          title="Agrandir l’écran"
           onClick={() => {
             controls.releaseAll()
             dialog.current?.showModal()
@@ -212,7 +206,7 @@ export function PSPConsole() {
             dialog.current?.focus({ preventScroll: true })
           }}
         >
-          <Maximize2 size={12} aria-hidden="true" /> Agrandir l’écran
+          <Maximize2 size={16} aria-hidden="true" />
         </button>
       </div>
       <dialog

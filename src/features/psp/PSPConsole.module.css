@@ -29,9 +29,6 @@
   user-select: none;
 }
 
-.shadow {
-  z-index: 0;
-}
 .body {
   z-index: 2;
 }
@@ -115,26 +112,20 @@
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px 15px;
+  justify-content: flex-end;
   margin-top: 5px;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  color: #b6cbeb99;
 }
 .expandButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 28px;
-  padding: 3px 8px;
+  width: 32px;
+  height: 28px;
+  padding: 0;
   border: 1px solid #78b5ff33;
   border-radius: 4px;
   color: #c9dfff;
-  background: #0c1d3d80;
-  font-size: 10px;
+  background: #0c1d3d55;
   cursor: pointer;
 }
 .expandButton:hover {
@@ -210,16 +201,11 @@
 
 @media (max-width: 767px) {
   .toolbar {
-    gap: 4px 12px;
     margin-top: 8px;
   }
   .expandButton {
-    min-height: 40px;
-    padding: 5px 12px;
-    font-size: 12px;
-  }
-  .toolbar > span {
-    display: none;
+    width: 40px;
+    height: 40px;
   }
   .screenDialog {
     padding: 10px;
