@@ -1,0 +1,129 @@
+{
+  "width": 1620,
+  "height": 698,
+  "screen": {
+    "width": 480,
+    "height": 272,
+    "corners": [
+      [396.4471, 58.2857],
+      [1344.6936, 93.8846],
+      [1291.5621, 571.5644],
+      [317.308, 504.2701]
+    ]
+  },
+  "buttons": {
+    "circle": {
+      "x": 1498,
+      "y": 275,
+      "width": 102,
+      "height": 113,
+      "idle": "buttons/circle-idle.webp",
+      "pressed": "buttons/circle-pressed.webp"
+    },
+    "cross": {
+      "x": 1407,
+      "y": 353,
+      "width": 106,
+      "height": 114,
+      "idle": "buttons/cross-idle.webp",
+      "pressed": "buttons/cross-pressed.webp"
+    },
+    "down": {
+      "x": 145,
+      "y": 269,
+      "width": 97,
+      "height": 103,
+      "idle": "buttons/down-idle.webp",
+      "pressed": "buttons/down-pressed.webp"
+    },
+    "left": {
+      "x": 101,
+      "y": 213,
+      "width": 99,
+      "height": 85,
+      "idle": "buttons/left-idle.webp",
+      "pressed": "buttons/left-pressed.webp"
+    },
+    "right": {
+      "x": 216,
+      "y": 224,
+      "width": 124,
+      "height": 87,
+      "idle": "buttons/right-idle.webp",
+      "pressed": "buttons/right-pressed.webp"
+    },
+    "up": {
+      "x": 176,
+      "y": 151,
+      "width": 98,
+      "height": 102,
+      "idle": "buttons/up-idle.webp",
+      "pressed": "buttons/up-pressed.webp"
+    },
+    "home": {
+      "x": 271,
+      "y": 519,
+      "width": 103,
+      "height": 54,
+      "idle": "buttons/home-idle.webp",
+      "pressed": "buttons/home-pressed.webp"
+    },
+    "select": {
+      "x": 1104,
+      "y": 578,
+      "width": 109,
+      "height": 57,
+      "idle": "buttons/select-idle.webp",
+      "pressed": "buttons/select-pressed.webp"
+    },
+    "square": {
+      "x": 1334,
+      "y": 265,
+      "width": 106,
+      "height": 112,
+      "idle": "buttons/square-idle.webp",
+      "pressed": "buttons/square-pressed.webp"
+    },
+    "start": {
+      "x": 1223,
+      "y": 586,
+      "width": 102,
+      "height": 58,
+      "idle": "buttons/start-idle.webp",
+      "pressed": "buttons/start-pressed.webp"
+    },
+    "triangle": {
+      "x": 1424,
+      "y": 185,
+      "width": 106,
+      "height": 111,
+      "idle": "buttons/triangle-idle.webp",
+      "pressed": "buttons/triangle-pressed.webp"
+    },
+    "volume-down": {
+      "x": 408,
+      "y": 538,
+      "width": 75,
+      "height": 48,
+      "idle": "buttons/volume-down-idle.webp",
+      "pressed": "buttons/volume-down-pressed.webp"
+    },
+    "volume-up": {
+      "x": 510,
+      "y": 545,
+      "width": 76,
+      "height": 48,
+      "idle": "buttons/volume-up-idle.webp",
+      "pressed": "buttons/volume-up-pressed.webp"
+    }
+  },
+  "camera": {
+    "type": "PERSP",
+    "location": [3.04951810836792, -11.258712768554688, -2.479764938354492],
+    "rotationRadians": [1.8669365644454956, -0.13814565539360046, 0.2649903893470764],
+    "lens": 99.15277099609375,
+    "sensorWidth": 36.0,
+    "shift": [-0.007639590185135603, -0.028690390288829803]
+  },
+  "modelSource": "PSP red by aXel / CC BY 3.0"
+}

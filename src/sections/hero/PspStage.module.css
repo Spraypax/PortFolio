@@ -7,15 +7,12 @@
   isolation: isolate;
 }
 
-.mount {
-  position: absolute;
-  inset: 0;
-  /* Future layers use this single coordinate system; do not clip shell reflections. */
-}
-
 @media (max-width: 1023px) {
-  /* The empty reservation is unnecessary in the stacked phase-1 layout. */
   .stage {
-    display: none;
+    aspect-ratio: auto;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: min(100%, 820px);
+    justify-self: center;
   }
 }

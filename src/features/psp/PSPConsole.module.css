@@ -1,0 +1,237 @@
+.console {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  outline-offset: 8px;
+  border-radius: 12px;
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  --psp-scale: 0;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0 auto auto 0;
+  transform: scale(var(--psp-scale));
+  transform-origin: top left;
+  isolation: isolate;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.shadow {
+  z-index: 0;
+}
+.body {
+  z-index: 2;
+}
+.glass {
+  z-index: 4;
+}
+.reflections {
+  z-index: 5;
+}
+
+.screenPlane {
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: 1;
+  transform-origin: top left;
+  overflow: hidden;
+  background: #050d25;
+}
+
+.physicalButton {
+  position: absolute;
+  z-index: 3;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 30%;
+  background: transparent;
+  pointer-events: none;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.physicalButton img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 95ms ease-out;
+}
+
+.physicalButton .pressedSprite {
+  opacity: 0;
+}
+.physicalButton[data-pressed] img:first-child {
+  opacity: 0;
+  transition-duration: 60ms;
+}
+.physicalButton[data-pressed] .pressedSprite {
+  opacity: 1;
+  transition-duration: 60ms;
+}
+.physicalButton:focus-visible {
+  outline-width: 3px;
+  outline-offset: -5px;
+}
+
+.buttonHitArea {
+  position: absolute;
+  inset: 8%;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 25%;
+}
+.physicalButton[data-shape='round'] .buttonHitArea {
+  border-radius: 50%;
+  clip-path: ellipse(50% 48%);
+}
+.physicalButton[data-shape='system'] .buttonHitArea {
+  inset: 17% 8%;
+  border-radius: 40%;
+}
+.physicalButton[data-shape='direction'] .buttonHitArea {
+  clip-path: polygon(16% 0, 84% 0, 100% 20%, 100% 80%, 84% 100%, 16% 100%, 0 80%, 0 20%);
+}
+
+.toolbar {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 15px;
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: #b6cbeb99;
+}
+.expandButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid #78b5ff33;
+  border-radius: 4px;
+  color: #c9dfff;
+  background: #0c1d3d80;
+  font-size: 10px;
+  cursor: pointer;
+}
+.expandButton:hover {
+  border-color: #8dc6ff88;
+  background: #19345a99;
+}
+
+.screenDialog {
+  position: fixed;
+  inset: 0;
+  width: min(900px, calc(100vw - 28px));
+  max-width: none;
+  max-height: calc(100dvh - 28px);
+  margin: auto;
+  padding: 14px;
+  border: 1px solid #85b8f880;
+  border-radius: 12px;
+  color: #dfedff;
+  background: #06122bed;
+  box-shadow:
+    0 24px 100px #0009,
+    inset 0 1px #bddbff26;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.screenDialog::backdrop {
+  background: #010614bd;
+  backdrop-filter: blur(7px);
+}
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.dialogHeader h2 {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.dialogHeader button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid #7eacdf55;
+  border-radius: 5px;
+  color: #d2e5ff;
+  background: #1b325a88;
+  cursor: pointer;
+}
+.enlargedScreen {
+  width: 100%;
+  height: min(68dvh, 500px);
+  overflow: hidden;
+  border: 1px solid #7b9dcc66;
+  border-radius: 5px;
+}
+.dialogHelp {
+  margin: 10px 2px 0;
+  color: #a8bedb;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1023px) {
+  .toolbar {
+    position: static;
+  }
+}
+
+@media (max-width: 767px) {
+  .toolbar {
+    gap: 4px 12px;
+    margin-top: 8px;
+  }
+  .expandButton {
+    min-height: 40px;
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  .toolbar > span {
+    display: none;
+  }
+  .screenDialog {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .enlargedScreen {
+    height: min(71dvh, 540px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .physicalButton img {
+    transition: none;
+  }
+}
