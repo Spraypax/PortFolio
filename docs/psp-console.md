@@ -12,7 +12,7 @@ Les sources extraites sont conservées dans `assets-source/psp/model-v2/` : `psp
 017708E21EA111F3111AFAB3487701CFEE6EBA81927A25CA3E1E2400EB9B46CB
 ```
 
-L’inventaire FBX compte **21 meshes et un objet vide** : le sol d’origine, les trois parties de la coque, le couvercle latéral `cap_low`, l’écran et quinze boutons déjà séparés. Le joystick visible n’est pas un mesh autonome nommé dans cet inventaire ; il reste un détail de la façade et n’a pas de nouvelle interaction. Chaque mesh possède une couche UV ; l’inventaire ne contient aucun modificateur. Six textures PBR sont fournies : albedo, occlusion ambiante, émissif, métal, normales et rugosité. La texture d’opacité du sol est conservée avec les sources, mais le sol original n’est pas utilisé dans les rendus du portfolio.
+L’inventaire FBX compte **21 meshes et un objet vide** : le sol d’origine, les trois parties de la coque, le couvercle latéral `cap_low`, l’écran et quinze boutons déjà séparés. Le joystick fait partie de la composante géométrique connectée de `toppart_low` ; `cap_low` est un cache latéral, pas le joystick. Le joystick n’a pas de nouvelle interaction. Chaque mesh possède une couche UV ; l’inventaire ne contient aucun modificateur. Six textures PBR sont fournies : albedo, occlusion ambiante, émissif, métal, normales et rugosité. La texture d’opacité du sol est conservée avec les sources, mais le sol original n’est pas utilisé dans les rendus du portfolio.
 
 `assets-source/psp/PSP-portfolio.blend` est le master adapté et reproductible. `reference.png` conserve la capture donnée par l’utilisateur. L’ancien `PSP-original.blend`, son `original-inventory.json` et `BLENDSWAP_LICENSE.txt` restent conservés : **« PSP red » de aXel / CC BY 3.0** désigne uniquement ce modèle historique, pas le remplacement.
 
@@ -24,8 +24,8 @@ La géométrie et les UV du FBX fourni sont réutilisés. Le sol et l’objet vi
 
 - Adaptation de la géométrie à la dalle et à la caméra existantes, sans déplacement correctif de l’interface React. Les coordonnées source de la dalle sont X = −0,0472591966 à 0,0469950773 et Z = −0,0015805531 à 0,0514134541, après normalisation d’orientation. Elles sont projetées dans le repère cible X = **−1,7724657059 à 0,9286899567**, Z = **0,3342224658 à 1,6434509754**, avec Y de dalle = **−0,3079999983**.
 - Les portions latérales hors dalle sont redimensionnées depuis leurs bords respectifs avec des coefficients **24,5 à gauche et 19,5 à droite**. Les marges au-dessus et au-dessous de la dalle sont comprimées respectivement par **0,70 et 0,60**. La profondeur utilise `Y = −0,3079999983 + (Ysource + 0,03245572187) × 17`.
-- Reconstruction des matériaux Principled à partir des six cartes fournies. Albedo et émissif restent en couleur ; AO, métal, rugosité et normales sont lus en données linéaires (`Non-Color`). La teinte graphite froide et les symboles bleutés sont obtenus dans les matériaux, sans modifier les textures sources.
-- AO mélangée à 35 %, rugosité remappée entre 0,18 et 0,49 pour la coque et les commandes, normal map d’intensité 0,55, émission 0,12 et vernis modéré. Le mesh `middlepart_low` devient `ChromeEdges / middlepart_low` : métal argenté à 0,92, rugosité entre 0,16 et 0,31. Les reflets proviennent de cette géométrie fournie et de l’éclairage.
+- Correction des normales personnalisées importées sous cette déformation non uniforme : chaque normale est transformée par l’inverse transposée du Jacobien local, ici les composantes divisées par les coefficients X/Y/Z correspondants, puis renormalisée. Les normales de coins restent personnalisées ; les coordonnées des vertices, les UV et la topologie ne sont pas modifiés par ce réglage de réalisme.
+- Reconstruction de matériaux Principled distincts pour la façade noire brillante, l’arrière satiné, les commandes, les boutons système, le grip analogique et le chrome. Albedo et émissif restent en couleur ; AO, métal, rugosité et normales sont lus en données linéaires (`Non-Color`). Les six cartes 4096 × 4096 restent intégrées au master, sans retouche des fichiers sources. Le mesh `middlepart_low` devient `ChromeEdges / middlepart_low`.
 - Conservation des treize identifiants de commande déjà utilisés par React. Les quatre directions et les quatre boutons d’action étant déjà séparés, aucune découpe approximative du D-pad n’est nécessaire. Les boutons source **12 (Display) et 13 (Music) restent décoratifs**, sans nouvelle fonction ni zone interactive.
 - Remplacement du matériau de `screen_low`, renommé `ScreenOpening`, par un matériau **Holdout** qui retire le menu LCD peint du rendu. Une vitre transparente séparée fournit les reflets. Le fond affiché par React reste l’illustration dédiée existante, générée avec ImageGen : ville nocturne bleue, galaxie, lune et silhouette assise. Ce fond ne remplace pas celui du portfolio.
 
@@ -38,25 +38,66 @@ Les collections sous `PSP_ROOT` restent `BODY`, `SCREEN`, `DPAD`, `ACTION_BUTTON
 | `button9_low` à `button11_low` | `home`, `volume-down`, `volume-up`      |
 | `button14_low`, `button15_low` | `select`, `start`                       |
 
-Le résultat est une adaptation du modèle fourni à la référence, pas une copie pixel pour pixel de la photographie. La topologie de la coque, certains petits détails et l’illustration d’écran restent propres à cette réalisation.
+### Matériaux et détails de surface
+
+Les valeurs suivantes sont définies dans `pbr_material()` ; la rugosité fournie est remappée dans chaque intervalle :
+
+| Surface                          | Rugosité  | Poids du vernis | Métal  |
+| -------------------------------- | --------- | --------------- | ------ |
+| Façade noire brillante           | 0,12–0,29 | 0,48            | 0      |
+| Arrière et cache latéral satinés | 0,25–0,42 | 0,10            | 0      |
+| D-pad et boutons d’action        | 0,18–0,32 | 0,18            | 0      |
+| Boutons système                  | 0,24–0,40 | 0,08            | 0      |
+| Grip analogique mat              | 0,58–0,76 | 0               | 0      |
+| Cadre argenté                    | 0,10–0,22 | 0               | 0,94–1 |
+
+Le plastique est traité comme un diélectrique. Le shader utilise un IOR de 1,48, un niveau spéculaire de 0,46 et, lorsqu’il est présent, un vernis d’IOR 1,46 et de rugosité 0,12. L’albedo passe par un gamma de 1,20 pour la coque ou 1,12 pour les commandes, puis une teinte froide. L’AO fournie contribue à 50 % ; les matériaux non métalliques ajoutent 20 % d’occlusion locale calculée, avec une distance de 0,035 et 16 échantillons. L’émission est limitée à 0,035 hors commandes et nulle sur celles-ci.
+
+La carte de normales a une intensité de 0,75, ou 1 pour le grip. Un **[nœud de shader Bevel](https://docs.blender.org/manual/en/latest/render/shader_nodes/input/bevel.html)**, avec quatre échantillons et un rayon de 0,004 unité, adoucit les reflets d’arête ; le rayon passe à 0,0025 pour les boutons et le grip. Il ne s’agit **pas d’un modificateur géométrique** : ce nœud ne crée pas de chanfreins dans la silhouette et n’ajoute aucun vertex. Il augmente le coût du rendu Cycles, sans coût 3D dans le navigateur.
+
+Le matériau caoutchouc est affecté aux faces existantes du joystick par sélection spatiale de leur centre : cercle de rayon **0,116**, centré en X/Z = **−2,19072747 / 0,45399523**, et Y < **−0,3255**. Il n’y a ni découpe ni déplacement de cette géométrie. La saillie centrale mesurée est d’environ 0,01728 unité devant la façade locale.
+
+La vitre mélange transparence et réflexion selon **Fresnel, IOR 1,46, multiplié par 0,32** ; sa rugosité réfléchissante est de 0,10. Elle reste un calque indépendant devant le contenu React.
+
+### Fidélité et limites observées
+
+Les comparaisons d’aperçus avant/après montrent un noir plus profond, des reflets directionnels plus lisibles autour de l’écran et une meilleure perception du relief des commandes. La seconde candidate réduit la brillance des boutons système et du reflet gauche par rapport à la première. Ces observations ne constituent pas une certification de photoréalisme ni une reproduction exacte de la référence : celle-ci présente un plastique plus finement texturé et satiné, des symboles plus bleutés et des détails différents.
+
+Une [comparaison visuelle conservée dans le repository](images/psp-realism-comparison.webp) présente la référence, l’état avant réglage et la composition finale dans le portfolio. Cette dernière inclut tous les calques et l’ombre atténuée ; elle a également été inspectée, au-delà des aperçus monoblocs.
+
+Les vingt meshes adaptés de la source totalisent **29 974 vertices et 58 200 triangles**, hors vitre dupliquée et récepteur d’ombre. Leur silhouette, leurs UV, les inscriptions et les détails peints restent ceux de la source adaptée. Le réglage de matériaux ne remplace pas la topologie par un modèle plus détaillé ; les grandes surfaces planes restent planes. Les logos, les petits libellés et les boutons décoratifs ne sont pas redessinés. L’illustration d’écran reste également distincte de celle de la référence.
 
 ## Caméra, éclairage et calage
 
 Caméra perspective fixe, verrouillée en position, rotation et échelle :
 
-| Paramètre               | Valeur                            |
-| ----------------------- | --------------------------------- |
-| Résolution              | 1620 × 698, transparent RGBA      |
-| Focale / capteur        | 99,15277 mm / 36 mm               |
-| Position XYZ            | 3,049518 ; −11,258713 ; −2,479765 |
-| Rotation XYZ en radians | 1,866937 ; −0,138146 ; 0,264990   |
-| Décalage optique XY     | −0,007640 ; −0,028690             |
-| Moteur / échantillons   | Cycles / 64, débruitage activé    |
-| Gestion des couleurs    | AgX                               |
+| Paramètre                 | Valeur                                  |
+| ------------------------- | --------------------------------------- |
+| Résolution                | 1620 × 698, transparent RGBA            |
+| Focale / capteur          | 99,15277 mm / 36 mm                     |
+| Position XYZ              | 3,049518 ; −11,258713 ; −2,479765       |
+| Rotation XYZ en radians   | 1,866937 ; −0,138146 ; 0,264990         |
+| Décalage optique XY       | −0,007640 ; −0,028690                   |
+| Moteur / échantillons     | Cycles / 128 maximum, débruitage activé |
+| Échantillonnage adaptatif | Activé, seuil 0,015                     |
+| Gestion des couleurs      | AgX                                     |
 
-La caméra et les quatre points de dalle restent ceux de l’intégration précédente. Leur position découle de l’ajustement initial sur les coins de l’écran de référence. Le FBX est adapté à ce repère : façade vers −Y, verticale sur Z. L’aperçu utilise 24 échantillons et 65 % de la résolution ; les exports définitifs utilisent les dimensions complètes ci-dessus.
+La caméra et les quatre points de dalle restent ceux de l’intégration précédente. Leur position découle de l’ajustement initial sur les coins de l’écran de référence. Le FBX est adapté à ce repère : façade vers −Y, verticale sur Z. L’aperçu utilise 48 échantillons maximum ; l’aperçu et les exports définitifs utilisent tous deux **100 % de la résolution**, soit 1620 × 698.
 
-Éclairage par quatre surfaces : softbox froide (440 W, 5 × 2), bord bleu (340 W, 3 × 1), bord violet (230 W, 3 × 1) et remplissage frontal (25 W, 4 × 3). Les positions, couleurs et cibles exactes sont conservées dans `scripts/psp/build_scene.py` et dans le `.blend`. Le monde contribue avec une intensité de 0,35. Le fond est transparent.
+Éclairage par six surfaces rectangulaires :
+
+| Lumière                     | Puissance | Dimensions |
+| --------------------------- | --------- | ---------- |
+| Softbox argentée principale | 330 W     | 3,4 × 1,25 |
+| Bord bleu                   | 260 W     | 2,8 × 0,65 |
+| Bord violet                 | 180 W     | 2,6 × 0,65 |
+| Remplissage frontal         | 18 W      | 4 × 3      |
+| Bande réfléchissante gauche | 55 W      | 0,55 × 3   |
+| Bande réfléchissante droite | 65 W      | 0,35 × 2,4 |
+
+Les positions, couleurs et cibles exactes sont conservées dans `scripts/psp/build_scene.py` et dans le `.blend`. Le monde contribue avec une intensité de **0,22**. Le fond reste transparent ; le background du portfolio n’est pas remplacé.
+
+Le récepteur d’ombre est incliné suivant la normale unitaire dérivée de **(0 ; −0,45 ; 1)**. Sa position est calculée à partir du minimum du produit scalaire entre cette normale et les vertices de la console, avec un écart de **0,003 unité**. Cette construction le place sous le point d’appui de la géométrie, à la place de l’ancien plan horizontal éloigné de la coque. Le calque final applique ensuite un facteur d’alpha de **0,55**, enregistré dans `psp_shadow_opacity`, pour intégrer l’ombre au fond photographique existant. Le rendu d’aperçu monobloc utilise l’ombre native ; cette atténuation est propre à l’export du calque d’ombre.
 
 Coins de l’écran dans la capture de 810 × 349, puis projection de la dalle finale ramenée à cette même résolution :
 
@@ -75,22 +116,26 @@ Le redimensionnement applique une seule échelle au canevas complet. La coque, l
 
 Dans `src/assets/images/psp/` :
 
-| Fichier                  | Contenu                                                                    |
-| ------------------------ | -------------------------------------------------------------------------- |
-| `psp-body.webp`          | Coque, détails et supports, sans commandes interactives ni contenu d’écran |
-| `psp-shadow.webp`        | Ombre issue du shadow catcher Cycles                                       |
-| `psp-reflections.webp`   | Cadre intermédiaire argenté réfléchissant, même caméra                     |
-| `psp-screen-glass.webp`  | Surface transparente et reflets discrets de la vitre                       |
-| `screen-wallpaper.webp`  | Illustration de fond de l’écran React, 1440 × 810                          |
-| `buttons/*-idle.webp`    | Treize commandes au repos                                                  |
-| `buttons/*-pressed.webp` | Les mêmes commandes réellement enfoncées de 0,016 unité suivant Y          |
-| `layout.json`            | Résolution, quatre coins, rectangles des sprites et caméra                 |
+| Fichier                  | Contenu                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `psp-body.webp`          | Coque, détails et supports, sans commandes interactives ni contenu d’écran        |
+| `psp-shadow.webp`        | Ombre issue du shadow catcher Cycles                                              |
+| `psp-reflections.webp`   | Cadre intermédiaire argenté réfléchissant, même caméra                            |
+| `psp-screen-glass.webp`  | Surface transparente et reflets discrets de la vitre                              |
+| `screen-wallpaper.webp`  | Illustration de fond de l’écran React, 1440 × 810                                 |
+| `buttons/*-idle.webp`    | Treize commandes au repos                                                         |
+| `buttons/*-pressed.webp` | Commandes enfoncées suivant Y : 0,016 pour directions/actions, 0,004 pour système |
+| `layout.json`            | Résolution, quatre coins, rectangles des sprites et caméra                        |
 
-Les 26 sprites sont recadrés après rendu avec **le même rectangle pour les deux états**, sans déplacement des pixels. Le manifeste utilise l’union de la géométrie évaluée au repos et enfoncée, avec une marge de huit pixels ; une commande sortant du canevas provoque une erreur. Le script de recadrage contrôle les treize identifiants attendus, refuse les états vides et tout rectangle qui couperait des pixels visibles, vérifie les dimensions des grands calques et refuse les calques vides. Les deux états ont la même caméra, les mêmes matériaux et les mêmes lumières ; seul l’enfoncement de la pièce change. Le déplacement de 0,016 est enregistré dans la propriété de scène `psp_press_travel`.
+Les 26 sprites sont recadrés après rendu avec **le même rectangle pour les deux états**, sans déplacement des pixels. Le manifeste utilise l’union de la géométrie évaluée au repos et enfoncée, avec une marge de huit pixels ; une commande sortant du canevas provoque une erreur. Le script de recadrage contrôle les treize identifiants attendus, refuse les états vides et tout rectangle qui couperait des pixels visibles, vérifie les dimensions des grands calques et refuse les calques vides. Les deux états ont la même caméra, les mêmes matériaux et les mêmes lumières ; seul l’enfoncement de la pièce change.
 
-Le calque de reflets conserve l’occlusion de la façade et des commandes grâce à des objets Holdout temporaires. Seules les parties visibles du cadre métallique sont exportées : ses faces arrière ne se superposent pas à la coque lors de l’assemblage HTML. L’export restaure ces propriétés après le rendu.
+La course par défaut de **0,016** est enregistrée dans la propriété de scène `psp_press_travel`. Home, Select, Start et les deux boutons Volume portent une propriété d’objet du même nom, de **0,004**, prioritaire. Leur saillie locale mesurée est d’environ 0,00722 unité ; la course plus courte évite de les enfoncer derrière la façade. `press_distance()` est utilisé à la fois pour le manifeste et pour les rendus.
 
-Les noms des ressources et des commandes restent inchangés pour React ; les rectangles de boutons sont recalculés depuis les nouvelles pièces. `layout.json` contient également l’attribution `modelSource`. Les trente rendus v2 totalisent **435 510 octets (environ 425 Kio)** ; avec le fond d’écran conservé, **547 062 octets (environ 534 Kio)**. Les fichiers FBX, textures sources, Blender et scripts ne sont pas envoyés au navigateur.
+Le rendu de chaque sprite limite les rayons caméra au rectangle commun calculé dans le manifeste (`render border`). **Le canevas complet est conservé**, sans recadrage Blender (`use_crop_to_border = False`) : les origines de pixels restent identiques avant le recadrage Pillow. Toute la scène reste présente pour l’éclairage, les ombres et les reflets. Ce réglage réduit le travail de rendu des 26 états, notamment le coût du shader Bevel, sans déplacer les pièces.
+
+Le rendu de coque conserve les ombres et les reflets des commandes au repos : elles sont cachées aux seuls rayons caméra, plutôt que retirées du rendu. Les sprites, la vitre et le calque de reflets utilisent ensuite des objets **Holdout temporaires** pour conserver l’occlusion par le reste de la console. Les parties enfoncées derrière une surface ne sont donc pas artificiellement redessinées par-dessus celle-ci. Seules les parties visibles du cadre métallique sont exportées : ses faces arrière ne se superposent pas à la coque lors de l’assemblage HTML. L’export restaure les propriétés de visibilité, les positions et les paramètres de région après le rendu. Les ombres enregistrées dans le calque fixe de coque restent celles de l’état de repos ; ce calque n’est pas recalculé pendant les interactions web.
+
+Les noms des ressources et des commandes restent inchangés pour React ; les rectangles de boutons sont recalculés avec les courses adaptées. `layout.json` contient également l’attribution `modelSource`. Les trente rendus du réglage de réalisme totalisent **567 928 octets** après recadrage ; avec le fond d’écran conservé de 111 552 octets, le total est de **679 480 octets, environ 664 Kio**, hors manifeste. Les fichiers FBX, textures sources, Blender et scripts ne sont pas envoyés au navigateur.
 
 ## Architecture React et commandes
 
@@ -167,13 +212,27 @@ Ce second chemin **ne reconstruit pas le modèle**. Il recharge les objets porta
 
 Le déplacement d’appui repose sur l’axe +Y du modèle normalisé ; ne pas changer le repère des commandes sans adapter ce déplacement dans `render_layers.py`. Le script restaure les positions et la visibilité après les exports et n’enregistre pas un master avec des boutons enfoncés. `export_saved.py -- --check` recharge et contrôle les sources, puis calcule les coordonnées en mémoire **sans rendu ni réécriture du manifeste**. Sans cette option, `export_saved.py` écrit dans `src/assets/images/psp/` ; contrairement à `build_scene.py`, il n’a pas d’option de staging.
 
-Pour revenir à la version précédente, restaurer ensemble le master de `legacy-v1/` dans `assets-source/psp/PSP-portfolio.blend`, les quatre scripts dans `scripts/psp/`, la documentation dans `docs/psp-console.md` et les ressources de `rendered-assets.zip` dans leur emplacement `src/assets/images/psp/`. Les crédits de la console doivent alors correspondre de nouveau à la source aXel historique. **Ne pas exécuter les scripts archivés directement dans `legacy-v1/`** : ils calculent les chemins du projet depuis leur emplacement et doivent d’abord retrouver leurs chemins d’origine. Les sources originales des deux modèles restent conservées.
+Pour retrouver le modèle historique aXel, restaurer ensemble le master de `legacy-v1/` dans `assets-source/psp/PSP-portfolio.blend`, les quatre scripts dans `scripts/psp/`, la documentation dans `docs/psp-console.md` et les ressources de `rendered-assets.zip` dans leur emplacement `src/assets/images/psp/`. Les crédits de la console doivent alors correspondre de nouveau à la source aXel historique. **Ne pas exécuter les scripts archivés directement dans `legacy-v1/`** : ils calculent les chemins du projet depuis leur emplacement et doivent d’abord retrouver leurs chemins d’origine. Les sources originales des deux modèles restent conservées. L’état du modèle Ilya précédant uniquement le réglage de réalisme est conservé dans la révision Git antérieure et, localement, dans `.verification/psp-realism/before-master.blend`, `before-assets.zip` et les copies des scripts ; ce dossier local n’est pas versionné.
 
 Pour modifier le contenu ou ajouter une rubrique, intervenir dans `PSPScreen.tsx`, les données correspondantes et le réducteur ; ne pas déplacer la dalle à la main dans le CSS. Toute nouvelle commande doit suivre le même chemin `press/release/trigger` afin de conserver la synchronisation visuelle.
 
-## Vérifications du remplacement
+## Vérifications du réglage de réalisme
 
-**Vérifications terminées le 5 novembre 2026.** Les 70 tests du repository, ESLint, la compilation TypeScript et le build Vite passent. La comparaison avant/après à 1600, 1024, 768 et 390 px confirme des dimensions identiques pour la navbar, la grille Hero, les autres sections, l’emplacement PSP et la largeur de page.
+**Validation terminée le 5 novembre 2026.** Le master enregistré a été comparé en lecture seule à la sauvegarde antérieure `.verification/psp-realism/before-master.blend`. Les vingt meshes de console et la vitre conservent exactement leurs coordonnées de vertices, arêtes, polygones, boucles, UV, transformations d’objets et identifiants source. La caméra, les paramètres optiques, les quatre repères d’écran, la résolution et les treize identifiants de commande sont identiques. Les courses vérifiées sont 0,004 pour les cinq commandes système et 0,016 pour les huit directions/actions. La transformation du récepteur d’ombre change volontairement ; les normales et les matériaux sont également modifiés.
+
+Les audits et aperçus comparatifs avant/candidate 1/candidate 2 sont conservés localement dans `.verification/psp-realism/`. Les trente exports définitifs ont été contrôlés, pesés et intégrés : dimensions, transparence LCD, absence de découpe de la coque et des sprites, états d’appui distincts et fond d’écran conservé. Leur composition complète a été inspectée sur desktop et mobile, avec l’ombre finale atténuée. La comparaison des dimensions de page avant/après passe aux quatre largeurs 1600, 1024, 768 et 390 px.
+
+- Les **70 tests**, ESLint, TypeScript et le build Vite passent.
+- Chrome : treize commandes physiques, clavier, navigation, détails, options/aide/crédits, écran agrandi, conservation d’état et restitution du focus validés.
+- Largeurs 1920, 1600, 1440, 1024, 768, 390 et 320 px, événements tactiles simulés, perte de focus, réduction des animations, actualisation et décodage de tous les assets validés.
+- Sons de navigation **On par défaut**, absence de son au simple chargement, désactivation/réactivation dans Options et respect du mute musical vérifiés. Le script de vérification actuel est `.verification/psp-realism/edge-check.cjs` ; l’ancien script de remplacement supposait encore Off au démarrage.
+- Élément musical unique et continu à **5 %**, dialogue About extérieur à la PSP et limites de portée du clavier vérifiés ; aucune erreur JavaScript observée.
+
+Les scripts locaux exécutés sont `.verification/psp-realism/browser-comparison.cjs after`, `.verification/psp-integration.cjs`, `.verification/psp-realism/edge-check.cjs` et `.verification/verify-psp-v2-assets.py`, en complément des commandes npm. Aucun composant React, style du site ou contenu d’écran n’a été modifié pour ce réglage.
+
+## Vérifications du remplacement précédent
+
+**État validé avant le réglage de réalisme, le 5 novembre 2026.** Les 70 tests du repository, ESLint, la compilation TypeScript et le build Vite passaient. La comparaison avant/après à 1600, 1024, 768 et 390 px confirmait des dimensions identiques pour la navbar, la grille Hero, les autres sections, l’emplacement PSP et la largeur de page.
 
 ```powershell
 npm test
