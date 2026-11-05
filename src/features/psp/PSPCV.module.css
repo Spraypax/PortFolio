@@ -1,0 +1,162 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  min-height: 27px;
+  padding: 0 1px 5px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #719aca transparent;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.toolbar button,
+.toolbar a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 21px;
+  min-height: 21px;
+  padding: 3px;
+  border: 1px solid #80b7f64d;
+  border-radius: 3px;
+  color: #dfedff;
+  background: #183759b3;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.toolbar a.download {
+  padding-inline: 6px;
+  background: #214d80a6;
+}
+
+.toolbar button:hover:not(:disabled),
+.toolbar a:hover {
+  background: #2b598ccc;
+  border-color: #a0d0ffb3;
+}
+
+.toolbar button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.toolbar button:focus-visible,
+.toolbar a:focus-visible,
+.scrollArea:focus-visible {
+  outline: 1px solid #bce3ff;
+  outline-offset: -1px;
+}
+
+.viewer .toolbar svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.controlGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.counter {
+  min-width: 31px;
+  color: #d8e9ff;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.scrollArea {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: #8badd7 #102440;
+  border: 1px solid #7c9cb34d;
+  border-radius: 2px;
+  background: #13233c;
+}
+
+.page {
+  display: block;
+  width: calc(100% * var(--cv-zoom, 1));
+  max-width: none;
+  height: auto;
+  margin: 0;
+  user-select: none;
+  background: white;
+}
+
+.viewer[data-enlarged] .toolbar {
+  gap: 7px;
+  min-height: 43px;
+  padding-bottom: 8px;
+  font-size: 12px;
+}
+
+.viewer[data-enlarged] .toolbar button,
+.viewer[data-enlarged] .toolbar a {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 7px;
+}
+
+.viewer[data-enlarged] .toolbar svg {
+  width: 16px;
+  height: 16px;
+}
+
+.viewer[data-enlarged] .counter {
+  min-width: 38px;
+}
+
+@media (max-width: 767px) {
+  .viewer[data-enlarged] .toolbar button,
+  .viewer[data-enlarged] .toolbar a {
+    min-width: 42px;
+    min-height: 42px;
+  }
+}
+
+@container (max-width: 440px) {
+  .viewer[data-enlarged] .toolbar {
+    flex-wrap: wrap;
+    gap: 5px;
+    overflow-x: visible;
+    font-size: 11px;
+  }
+  .viewer[data-enlarged] .toolbar button,
+  .viewer[data-enlarged] .toolbar a {
+    min-width: 36px;
+    min-height: 38px;
+    padding: 5px;
+  }
+  .viewer[data-enlarged] .counter {
+    min-width: 28px;
+  }
+}

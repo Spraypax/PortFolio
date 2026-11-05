@@ -143,16 +143,17 @@ Les noms des ressources et des commandes restent inchangés pour React ; les rec
 
 Le texte visible des raccourcis sous la console a été retiré ; les raccourcis eux-mêmes et les indications accessibles aux lecteurs d’écran restent disponibles. L’agrandissement utilise une icône discrète alignée en bas à droite sous la console, avec le nom accessible et l’infobulle « Agrandir l’écran ». Sa zone mesure 32 × 28 px sur desktop/tablette et 40 × 40 px sur mobile. La barre reste dans le flux sous 1024 px.
 
-`usePSPControls` constitue le point d’entrée commun souris/tactile/clavier. Il gère les appuis, relâchements, annulations de pointeur, pertes de focus et sons optionnels. `pspNavigation.ts` contient le réducteur pur : page actuelle, sélection, page d’origine, détail, historique, panneaux d’aide/options/crédits, luminosité et sons.
+`usePSPControls` constitue le point d’entrée commun souris/tactile/clavier. Il gère les appuis, relâchements, annulations de pointeur, pertes de focus et sons optionnels. `pspNavigation.ts` contient le réducteur pur : catégorie, page actuelle, sélection mémorisée dans chaque catégorie, paragraphe About, page et zoom du CV, panneaux d’aide/options/crédits, luminosité et sons. Le composant commun `PSPXMB` affiche les quatre catégories horizontales et leur liste verticale, configurées dans `pspContent.ts` à partir des données existantes.
 
 | Commande        | Action                                                  |
 | --------------- | ------------------------------------------------------- |
-| D-pad / flèches | Sélection précédente/suivante, avec boucle              |
+| Gauche / droite | Catégorie précédente/suivante, avec boucle ; retour au XMB |
+| Haut / bas      | Élément précédent/suivant avec boucle ; paragraphes About ou pages CV dans leur détail |
 | Croix / Entrée  | Ouvrir ou confirmer ; ouvrir un lien depuis son détail  |
 | Cercle / Échap  | Fermer le panneau, revenir du détail ou revenir au menu |
 | Triangle / S    | Options : sons et luminosité                            |
 | Carré / A       | Aide                                                    |
-| Start / Home    | Menu principal, sélection conservée                     |
+| Start / Home    | Accueil XMB, catégorie et sélections conservées          |
 | Select          | Crédits et attribution du modèle                        |
 | Volume − / +    | Niveau des seuls effets PSP, de 0 à 3                   |
 
@@ -160,16 +161,19 @@ Les raccourcis sont gérés par propagation dans la console, jamais par un écou
 
 Les rubriques réutilisent les données réelles du portfolio :
 
-- **About** : profil et paragraphes de `src/data/about.ts` ; navigation entre paragraphes.
+- **Home → About** : profil et paragraphes de `src/data/about.ts` ; navigation entre paragraphes.
+- **Home → CV** : les deux pages du véritable PDF référencé par `src/data/profile.ts`, pagination, zoom de 100 à 400 %, vue agrandie, ouverture du PDF original et téléchargement réel.
 - **Projects** : projets de `src/data/projects.ts` ; vignettes, détails, tags et liens existants.
 - **Skills** : catégories de `src/data/skills.ts` ; liste puis compétences de chaque catégorie.
-- **Contact** : adresse et liens de `src/data/socialLinks.ts` ; détail avant ouverture explicite.
+- **Contact** : adresse et liens de `src/data/socialLinks.ts` ; confirmation dans la liste ouvrant la destination réelle et affichant son détail. Seules les entrées configurées sont proposées.
 
-About est sélectionné au démarrage. La navigation ne modifie pas l’URL et ne fait pas défiler la page principale. Seuls les liens confirmés ouvrent explicitement une destination externe ou le client de messagerie.
+**Home** est la catégorie sélectionnée au démarrage, avec **About** sélectionné dans sa liste ; aucun détail n’est ouvert automatiquement. Les quatre catégories utilisent le même menu vertical animé. Les sélections sont conservées lors des changements de catégorie et du retour au XMB ; les listes vides restent navigables. La navigation ne modifie pas l’URL et ne fait pas défiler la page principale. Seuls les liens confirmés ouvrent explicitement une destination externe ou le client de messagerie.
 
-L’état est volontairement limité à la session React : l’actualisation revient au menu initial. Le mode agrandi partage **le même contrôleur** et conserve la sélection et la page. L’écran miniature est alors inerte pour l’accessibilité. Le dialogue natif gère le focus modal ; sa fermeture rend le focus au bouton d’ouverture. Échap revient d’abord dans la navigation, puis ferme la vue agrandie à l’accueil.
+L’état est volontairement limité à la session React : l’actualisation revient au menu initial. Le mode agrandi partage **le même contrôleur** et conserve les sélections, la page et le zoom du CV. L’écran miniature est alors inerte pour l’accessibilité. Le dialogue natif gère le focus modal ; sa fermeture rend le focus au bouton d’ouverture. Échap revient d’abord dans la navigation, puis ferme la vue agrandie à l’accueil XMB.
 
 Les sons sont des notes synthétisées localement, activées par défaut (`Navigation sounds: On`) et désactivables dans les options de la PSP. Ils sont déclenchés uniquement après interaction, respectent le mute mémorisé du lecteur musical et ne modifient ni son volume de 5 %, ni sa position, ni ses événements. Une seule note de navigation est active à la fois. Un refus de Web Audio laisse la navigation silencieuse et fonctionnelle.
+
+Le menu Options affiche uniquement **On / Off** pour les sons, sans fraction ni niveau intermédiaire. Les touches VOL conservent leur réglage interne ; un niveau nul correspond à Off. Le texte explicatif précédent est retiré. Les trois options et le bouton de retour tiennent dans le panneau, y compris dans la vue agrandie mobile et en paysage, sans scrollbar ni option masquée. Les détails de maintenance du CV et de validation de cette navigation figurent dans [psp-xmb.md](psp-xmb.md).
 
 ## Reproduire ou modifier les rendus
 

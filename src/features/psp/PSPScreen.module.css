@@ -188,6 +188,20 @@
   color: #a5bee0;
   font-size: 1.9cqw;
 }
+.contentTitle > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.contentTitle button {
+  flex-shrink: 0;
+  padding: 0.3cqw 0 0.3cqw 1.5cqw;
+  color: #bddaff;
+  background: transparent;
+  font-size: 2.1cqw;
+  white-space: nowrap;
+}
 .contentBody {
   min-height: 0;
   flex: 1;
@@ -196,6 +210,12 @@
   scrollbar-width: thin;
   scrollbar-color: #7ea5d2 #0b1b39;
   padding: 2.2cqw;
+}
+.contentBody.cvBody {
+  display: flex;
+  flex-direction: column;
+  padding: 1.4cqw;
+  overflow: hidden;
 }
 .content h3 {
   margin: 0 0 1cqw;
@@ -365,13 +385,19 @@
   font-size: 3cqw;
   font-weight: 500;
 }
-.optionList,
 .help,
 .credits {
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+.optionList {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  overflow: visible;
 }
 .optionList > button {
   display: flex;
@@ -382,6 +408,8 @@
   border-radius: 0.5cqw;
   background: transparent;
   text-align: left;
+  align-items: center;
+  min-height: 0;
 }
 .optionList > button[aria-current] {
   background: #2e609d70;
@@ -463,6 +491,9 @@
   font-size: max(15px, 2.65cqw);
   padding: max(7px, 1.3cqw) max(10px, 2.3cqw);
 }
+.enlarged .contentTitle button {
+  font-size: max(11px, 2.1cqw);
+}
 .enlarged .contentTitle span:last-child,
 .enlarged .small {
   font-size: max(11px, 1.9cqw);
@@ -535,8 +566,8 @@
   margin-bottom: max(8px, 1.7cqw);
 }
 .enlarged .optionList > button {
-  min-height: 44px;
-  padding: max(7px, 1.4cqw);
+  min-height: 0;
+  padding: clamp(4px, 1cqw, 9px);
 }
 .enlarged .overlay .note {
   font-size: max(11px, 1.9cqw);
@@ -580,5 +611,22 @@
   .screen::after,
   .screen .menuItem {
     transition: none;
+  }
+}
+
+@media (max-height: 500px) {
+  .enlarged .overlay[data-panel='options'] {
+    inset: 12% 4% 8%;
+    padding: 8px;
+    font-size: 12px;
+  }
+  .enlarged .overlay[data-panel='options'] h3 {
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+  .enlarged .overlay[data-panel='options'] .closeOverlay {
+    min-height: 24px;
+    padding-top: 2px;
+    font-size: 11px;
   }
 }

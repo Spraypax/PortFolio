@@ -1,0 +1,18 @@
+{
+  "source": "src/assets/documents/DUPONT_Lelian_CV_ATS.pdf",
+  "sourceSha256": "e14e8940c21d5e98de46826a0b726e157a43b17eb9de1604e19d86cfea6b87b8",
+  "renderDpi": 192,
+  "pageCount": 2,
+  "pages": [
+    {
+      "file": "page-01.webp",
+      "width": 1588,
+      "height": 2246
+    },
+    {
+      "file": "page-02.webp",
+      "width": 1588,
+      "height": 2246
+    }
+  ]
+}

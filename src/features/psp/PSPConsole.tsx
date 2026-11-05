@@ -120,11 +120,18 @@ export function PSPConsole() {
     opener.current?.focus({ preventScroll: true })
   }
 
+  function openScreen() {
+    controls.releaseAll()
+    dialog.current?.showModal()
+    setExpanded(true)
+    dialog.current?.focus({ preventScroll: true })
+  }
+
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (
       expanded &&
       event.key === 'Escape' &&
-      controls.state.currentPage === 'home' &&
+      controls.state.currentPage === 'xmb' &&
       !controls.state.panel
     ) {
       event.preventDefault()
@@ -175,7 +182,7 @@ export function PSPConsole() {
             aria-hidden={expanded || undefined}
             inert={expanded || undefined}
           >
-            <PSPScreen controls={controls} />
+            <PSPScreen controls={controls} onExpand={openScreen} />
           </div>
           <img className={`${styles.layer} ${styles.body}`} src={body} alt="" draggable={false} />
           {(Object.keys(layout.buttons) as PSPControl[]).map((control) => (
@@ -199,12 +206,7 @@ export function PSPConsole() {
           aria-haspopup="dialog"
           aria-label="Agrandir l’écran"
           title="Agrandir l’écran"
-          onClick={() => {
-            controls.releaseAll()
-            dialog.current?.showModal()
-            setExpanded(true)
-            dialog.current?.focus({ preventScroll: true })
-          }}
+          onClick={openScreen}
         >
           <Maximize2 size={16} aria-hidden="true" />
         </button>

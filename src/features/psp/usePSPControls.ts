@@ -3,7 +3,9 @@ import type { KeyboardEvent } from 'react'
 import { aboutParagraphs } from '@/data/about'
 import { projects } from '@/data/projects'
 import { skillCategories } from '@/data/skills'
-import { contact, socialLinks } from '@/data/socialLinks'
+import { profile } from '@/data/profile'
+import { pspContactEntries } from './pspContent'
+import { cvPageCount } from './cvDocument'
 import { readMusicSettings } from '@/features/music/musicSettings'
 import { initialPSPState, pspControlForKey, reducePSPNavigation } from './pspNavigation'
 import type { PSPControl, PSPNavigationAction } from './pspNavigation'
@@ -12,7 +14,8 @@ const counts = {
   about: aboutParagraphs.length,
   projects: projects.length,
   skills: skillCategories.length,
-  contact: socialLinks.length + 1,
+  contact: pspContactEntries.length,
+  cvPages: cvPageCount,
 }
 
 export function usePSPControls() {
@@ -51,7 +54,7 @@ export function usePSPControls() {
 
   const playTone = useCallback(
     (control: PSPControl) => {
-      // Original synthesized cues, opt-in and subordinate to the existing music mute.
+      // Original synthesized cues remain subordinate to the existing music mute.
       if (!state.soundEnabled || state.soundLevel === 0 || readMusicSettings(5).muted) return
       try {
         const context = (audio.current ??= new AudioContext())
@@ -85,36 +88,38 @@ export function usePSPControls() {
   )
 
   const activate = useCallback(
-    (control: PSPControl) => {
+    (control: PSPControl, action?: PSPNavigationAction) => {
       playTone(control)
-      if (control === 'cross' && state.detailOpen && !state.panel) {
+      if (control === 'cross' && !state.panel && (!action || action.type === 'open-item')) {
+        const index =
+          action?.type === 'open-item' ? action.index : state.selectedItems[state.category]
         const href =
           state.currentPage === 'projects'
-            ? projects[state.selectedIndex]?.cardUrl
-            : state.currentPage === 'contact'
-              ? state.selectedIndex === 0
-                ? `mailto:${contact.email}`
-                : socialLinks[state.selectedIndex - 1]?.url
-              : undefined
+            ? projects[index]?.cardUrl
+            : state.currentPage === 'contact' ||
+                (state.currentPage === 'xmb' && state.category === 'contact')
+              ? pspContactEntries[index]?.url
+              : state.currentPage === 'cv'
+                ? profile.cv.url
+                : undefined
         if (href) {
           if (href.startsWith('mailto:')) window.location.href = href
           else window.open(href, '_blank', 'noopener,noreferrer')
-          return
         }
       }
-      dispatch({ type: 'control', control })
+      dispatch(action ?? { type: 'control', control })
     },
     [playTone, state],
   )
 
   const press = useCallback(
-    (control: PSPControl) => {
+    (control: PSPControl, action?: PSPNavigationAction) => {
       const pending = releases.current.get(control)
       if (pending) clearTimeout(pending)
       releases.current.delete(control)
       pressedAt.current.set(control, performance.now())
       setPressed((current) => new Set(current).add(control))
-      activate(control)
+      activate(control, action)
     },
     [activate],
   )
@@ -141,8 +146,8 @@ export function usePSPControls() {
   }, [])
 
   const trigger = useCallback(
-    (control: PSPControl) => {
-      press(control)
+    (control: PSPControl, action?: PSPNavigationAction) => {
+      press(control, action)
       release(control)
     },
     [press, release],
@@ -161,12 +166,10 @@ export function usePSPControls() {
     if (!control) return
     event.preventDefault()
     event.stopPropagation()
-    if (event.key.startsWith('Arrow')) {
-      // Enter follows the selection after arrow navigation, even if a menu
-      // item had focus. Keep focus inside the screen or its enlarged dialog.
-      const scope = target.closest<HTMLElement>('[data-page], dialog') ?? event.currentTarget
-      scope.focus({ preventScroll: true })
-    }
+    // Keep focus on the stable screen before navigation hides or unmounts the
+    // focused item. This also keeps keyboard control when a panel makes XMB inert.
+    const scope = target.closest<HTMLElement>('[data-page], dialog') ?? event.currentTarget
+    scope.focus({ preventScroll: true })
     if (!event.repeat) press(control)
   }
 
